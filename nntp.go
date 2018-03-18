@@ -110,7 +110,7 @@ func (n *NNTP) Tail(ctx context.Context) <-chan *Result {
 				}
 				log.Printf("  current %d, previous %d\n", n.CurrentID, n.PreviousID)
 				for i := n.PreviousID + 1; i <= n.CurrentID; i++ {
-					distribution, err := readBody(client, n.CurrentID)
+					distribution, err := readBody(client, i)
 					ch <- &Result{Distribution: distribution, Err: err}
 				}
 				n.PreviousID = n.CurrentID
