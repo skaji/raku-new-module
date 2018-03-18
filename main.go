@@ -29,6 +29,12 @@ func main() {
 					}
 					log.Println(" producer")
 					log.Printf("  %v\n", r.Distribution)
+					URL, err := getGravatarURL(r.Distribution.CPANID)
+					if err != nil {
+						log.Print(err)
+						return
+					}
+					log.Println("   ", URL)
 				case s := <-sig:
 					log.Printf(" catch %v\n", s)
 					done = true
