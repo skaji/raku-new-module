@@ -94,6 +94,7 @@ func (n *NNTP) Tail(ctx context.Context) <-chan *Result {
 		}
 
 		ticker := time.NewTicker(n.Tick)
+		defer ticker.Stop()
 		for {
 			select {
 			case <-ticker.C:
