@@ -95,7 +95,6 @@ func (n *NNTP) Tail(ctx context.Context) <-chan *Result {
 		for {
 			select {
 			case <-ticker.C:
-				log.Println(" tick")
 				group, err = client.Group(n.Group)
 				if err != nil {
 					ch <- &Result{Err: err}
@@ -103,12 +102,19 @@ func (n *NNTP) Tail(ctx context.Context) <-chan *Result {
 				}
 				n.CurrentID = group.High
 				if n.PreviousID == -1 {
-					n.PreviousID = n.CurrentID - 1
+					n.PreviousID = n.CurrentID
 				}
-				log.Printf("  current %d, previous %d\n", n.CurrentID, n.PreviousID)
+				log.Printf(" tick, previous %d, current %d\n", n.PreviousID, n.CurrentID)
+
+				seen := 0
 				for i := n.PreviousID + 1; i <= n.CurrentID; i++ {
 					distribution, err := readBody(client, i)
 					ch <- &Result{Distribution: distribution, Err: err}
+					seen++
+					if seen > 5 {
+						log.Printf("  seen more than 5 articles, break")
+						break
+					}
 				}
 				n.PreviousID = n.CurrentID
 			case <-ctx.Done():

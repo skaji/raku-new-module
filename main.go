@@ -33,6 +33,9 @@ func main() {
 						continue
 					}
 					log.Printf("  %s\n", r.Distribution.AsJSON())
+					if !r.Distribution.IsPerl6 {
+						continue
+					}
 					_, _, err := twitter.Statuses.Update(r.Distribution.Summary(), nil)
 					if err != nil {
 						log.Println(err)
