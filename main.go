@@ -11,6 +11,11 @@ import (
 
 func main() {
 	log.Println("start")
+	twitter, err := newTwitter("./config.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	_ = twitter
 	nntp := NewNNTP("nntp.perl.org", "perl.cpan.uploads")
 	for {
 		done := false
@@ -24,17 +29,15 @@ func main() {
 				select {
 				case r := <-produce:
 					if r.Err != nil {
-						log.Print(r.Err)
-						return
+						log.Println(r.Err)
+						continue
 					}
-					log.Println(" producer")
-					log.Printf("  %v\n", r.Distribution)
-					URL, err := getGravatarURL(r.Distribution.CPANID)
+					log.Printf("  %s\n", r.Distribution.AsJSON())
+					_, _, err := twitter.Statuses.Update(r.Distribution.Summary(), nil)
 					if err != nil {
-						log.Print(err)
-						return
+						log.Println(err)
+						continue
 					}
-					log.Println("   ", URL)
 				case s := <-sig:
 					log.Printf(" catch %v\n", s)
 					done = true

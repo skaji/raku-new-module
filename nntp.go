@@ -8,19 +8,13 @@ import (
 	"log"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/dustin/go-nntp/client"
 )
 
 var distributionRegexp = regexp.MustCompile(`\$CPAN/(authors/id/./../([^/]+)/(Perl6/)?(.+)\.(?:tar\.gz|tar\.bz2|zip|tgz))`)
-
-type Distribution struct {
-	CPANID    string
-	Distvname string
-	IsPerl6   bool
-	Pathname  string
-}
 
 func parseBody(body string) (*Distribution, error) {
 	res := distributionRegexp.FindAllStringSubmatch(body, -1)
@@ -38,6 +32,9 @@ func parseBody(body string) (*Distribution, error) {
 	if r[3] == "Perl6/" {
 		d.IsPerl6 = true
 	}
+	parts := strings.Split(d.Distvname, "-")
+	d.Distname = strings.Join(parts[:len(parts)-1], "-")
+	d.MainModule = strings.Join(parts[:len(parts)-1], "::")
 	return &d, nil
 }
 
