@@ -15,7 +15,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_ = twitter
 	nntp := NewNNTP("nntp.perl.org", "perl.cpan.uploads")
 	for {
 		done := false
