@@ -22,7 +22,7 @@ type body struct {
 	Value1 string `json:"value1"`
 }
 
-func (i *IFTTT) Post(value string) error {
+func (i *IFTTT) Request(value string) error {
 	b, err := json.Marshal(body{Value1: value})
 	if err != nil {
 		return nil
