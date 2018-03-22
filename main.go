@@ -38,7 +38,7 @@ func main() {
 					// if !r.Distribution.IsPerl6 {
 					// 	continue
 					// }
-					err := ifttt.Request(r.Distribution.Summary())
+					err := ifttt.Post(r.Distribution.Summary())
 					if err != nil {
 						log.Println(err)
 						continue
