@@ -11,11 +11,14 @@ import (
 
 func main() {
 	log.Println("start")
-	twitter, err := newTwitter("./config.json")
+
+	c, err := LoadConfig("./config.json")
 	if err != nil {
 		log.Fatal(err)
 	}
+	ifttt := NewIFTTT("perl6_cpan_new", c.IFTTTKey)
 	nntp := NewNNTP("nntp.perl.org", "perl.cpan.uploads")
+
 	for {
 		done := false
 		func() {
@@ -32,10 +35,10 @@ func main() {
 						continue
 					}
 					log.Printf("  %s\n", r.Distribution.AsJSON())
-					if !r.Distribution.IsPerl6 {
-						continue
-					}
-					_, _, err := twitter.Statuses.Update(r.Distribution.Summary(), nil)
+					// if !r.Distribution.IsPerl6 {
+					// 	continue
+					// }
+					err := ifttt.Request(r.Distribution.Summary())
 					if err != nil {
 						log.Println(err)
 						continue
