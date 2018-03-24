@@ -31,7 +31,7 @@ func main() {
 						log.Println(r.Err)
 						continue
 					}
-					log.Printf("  %s\n", r.Distribution.AsJSON())
+					log.Println(r.Distribution.AsJSON())
 					if !r.Distribution.IsPerl6 {
 						continue
 					}
@@ -41,7 +41,7 @@ func main() {
 						continue
 					}
 				case s := <-sig:
-					log.Printf(" catch %v\n", s)
+					log.Printf("catch %v\n", s)
 					done = true
 					return
 				}

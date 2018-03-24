@@ -104,7 +104,6 @@ func (n *NNTP) Tail(ctx context.Context) <-chan *Result {
 				if n.PreviousID == -1 {
 					n.PreviousID = n.CurrentID
 				}
-				log.Printf(" tick, previous %d, current %d\n", n.PreviousID, n.CurrentID)
 
 				seen := 0
 				for i := n.PreviousID + 1; i <= n.CurrentID; i++ {
