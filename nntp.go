@@ -39,20 +39,22 @@ func parseBody(body string) (*Distribution, error) {
 }
 
 type NNTP struct {
-	CurrentID  int64
 	Group      string
-	PreviousID int64
 	Server     string
 	Tick       time.Duration
+	Offset     int64
+	currentID  int64
+	previousID int64
 }
 
 func NewNNTP(server string, group string) *NNTP {
 	return &NNTP{
-		CurrentID:  -1,
 		Group:      group,
-		PreviousID: -1,
 		Server:     server,
 		Tick:       30 * time.Second,
+		Offset:     0,
+		currentID:  -1,
+		previousID: -1,
 	}
 }
 
@@ -100,13 +102,13 @@ func (n *NNTP) Tail(ctx context.Context) <-chan *Result {
 					ch <- &Result{Err: err}
 					continue
 				}
-				n.CurrentID = group.High
-				if n.PreviousID == -1 {
-					n.PreviousID = n.CurrentID
+				n.currentID = group.High
+				if n.previousID == -1 {
+					n.previousID = n.currentID + n.Offset
 				}
 
 				seen := 0
-				for i := n.PreviousID + 1; i <= n.CurrentID; i++ {
+				for i := n.previousID + 1; i <= n.currentID; i++ {
 					distribution, err := readBody(client, i)
 					ch <- &Result{Distribution: distribution, Err: err}
 					seen++
@@ -115,10 +117,11 @@ func (n *NNTP) Tail(ctx context.Context) <-chan *Result {
 						break
 					}
 				}
-				n.PreviousID = n.CurrentID
+				n.previousID = n.currentID
 			case <-ctx.Done():
 				log.Println(" ctx.Done()")
 				client.Close()
+				close(ch)
 				return
 			}
 		}
