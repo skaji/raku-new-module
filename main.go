@@ -11,7 +11,7 @@ import (
 
 func main() {
 	log.Println("start")
-	twitter, err := newTwitter("./config.json")
+	twitter, err := NewTwitter("./config.json")
 	if err != nil {
 		log.Fatal(err)
 	}

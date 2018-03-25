@@ -2,42 +2,16 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
-	"regexp"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/dustin/go-nntp/client"
 )
 
-var distributionRegexp = regexp.MustCompile(`\$CPAN/(authors/id/./../([^/]+)/(Perl6/)?(.+)\.(?:tar\.gz|tar\.bz2|zip|tgz))`)
-
-func parseBody(body string) (*Distribution, error) {
-	res := distributionRegexp.FindAllStringSubmatch(body, -1)
-	if len(res) == 0 {
-		return nil, errors.New("failed to parse")
-	}
-
-	r := res[0]
-	d := Distribution{
-		CPANID:    r[2],
-		Distvname: r[4],
-		IsPerl6:   false,
-		Pathname:  r[1],
-	}
-	if r[3] == "Perl6/" {
-		d.IsPerl6 = true
-	}
-	parts := strings.Split(d.Distvname, "-")
-	d.Distname = strings.Join(parts[:len(parts)-1], "-")
-	d.MainModule = strings.Join(parts[:len(parts)-1], "::")
-	return &d, nil
-}
-
+// NNTP is
 type NNTP struct {
 	Group      string
 	Server     string
@@ -47,6 +21,7 @@ type NNTP struct {
 	previousID int64
 }
 
+// NewNNTP is
 func NewNNTP(server string, group string) *NNTP {
 	return &NNTP{
 		Group:      group,
@@ -58,11 +33,13 @@ func NewNNTP(server string, group string) *NNTP {
 	}
 }
 
+// Result is
 type Result struct {
 	Distribution *Distribution
 	Err          error
 }
 
+// Tail is
 func (n *NNTP) Tail(ctx context.Context) <-chan *Result {
 	ch := make(chan *Result)
 	go func() {
@@ -85,7 +62,7 @@ func (n *NNTP) Tail(ctx context.Context) <-chan *Result {
 			if err != nil {
 				return nil, err
 			}
-			distribution, err := parseBody(string(body))
+			distribution, err := NewDistribution(string(body))
 			if err != nil {
 				return nil, err
 			}

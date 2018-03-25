@@ -8,6 +8,7 @@ import (
 	"github.com/dghubble/oauth1"
 )
 
+// Config is
 type Config struct {
 	ConsumerKey    string `json:"consumer_key"`
 	ConsumerSecret string `json:"consumer_secret"`
@@ -27,7 +28,8 @@ func loadConfig(file string) (*Config, error) {
 	return c, nil
 }
 
-func newTwitter(file string) (*twitter.Client, error) {
+// NewTwitter is
+func NewTwitter(file string) (*twitter.Client, error) {
 	c, err := loadConfig(file)
 	if err != nil {
 		return nil, err
