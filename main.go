@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+func init() {
+	log.SetFlags(log.LstdFlags | log.Llongfile)
+}
+
 func main() {
 	log.Println("start")
 	twitter, err := NewTwitter("./config.json")
