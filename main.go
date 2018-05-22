@@ -19,12 +19,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	nntp := NewNNTP("nntp.perl.org", "perl.cpan.uploads")
+
+	sig := make(chan os.Signal)
+	signal.Notify(sig, syscall.SIGTERM, syscall.SIGINT)
 	for {
 		done := false
 		func() {
-			sig := make(chan os.Signal)
-			signal.Notify(sig, syscall.SIGTERM, syscall.SIGINT)
+			nntp := NewNNTP("nntp.perl.org", "perl.cpan.uploads")
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 			produce := nntp.Tail(ctx)
@@ -33,7 +34,7 @@ func main() {
 				case r := <-produce:
 					if r.Err != nil {
 						log.Println(r.Err)
-						continue
+						return
 					}
 					log.Println(r.Distribution.AsJSON())
 					if !r.Distribution.IsPerl6 {
