@@ -89,8 +89,8 @@ func (n *NNTP) Tail(ctx context.Context) <-chan *Result {
 					distribution, err := readBody(client, i)
 					ch <- &Result{Distribution: distribution, Err: err}
 					seen++
-					if seen > 5 {
-						log.Printf("  seen more than 5 articles, break")
+					if seen > 20 {
+						log.Printf("  seen more than 20 articles, break")
 						break
 					}
 				}
