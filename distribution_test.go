@@ -57,6 +57,9 @@ func TestDistribution(t *testing.T) {
 	var err error
 
 	d, err = NewDistribution("foo bar baz")
+	if _, ok := err.(*DistributionError); !ok {
+		t.Fatal("oops")
+	}
 	if err == nil {
 		t.Fatal("oops")
 	}

@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -11,11 +10,20 @@ import (
 var distributionRegexp = regexp.MustCompile(`[^/]/[^/]{2}/([^/]+)/(Perl6/)?([^/]+)\.(?:tar\.gz|tar\.bz2|zip|tgz)`)
 var versionRegexp = regexp.MustCompile(`^v?[\d_.]+$`)
 
+// DistributionError is
+type DistributionError struct {
+	Message string
+}
+
+func (d *DistributionError) Error() string {
+	return d.Message
+}
+
 // NewDistribution is
 func NewDistribution(body string) (*Distribution, error) {
 	res := distributionRegexp.FindAllStringSubmatch(body, -1)
 	if len(res) == 0 {
-		return nil, errors.New("failed to parse")
+		return nil, &DistributionError{"failed to parse"}
 	}
 
 	r := res[0]
@@ -32,7 +40,7 @@ func NewDistribution(body string) (*Distribution, error) {
 	parts := strings.Split(d.Distvname, "-")
 	for {
 		if len(parts) < 2 {
-			return nil, fmt.Errorf("%s does not have version", d.Distvname)
+			return nil, &DistributionError{fmt.Sprintf("%s does not have version", d.Distvname)}
 		}
 		if versionRegexp.MatchString(parts[len(parts)-1]) {
 			break

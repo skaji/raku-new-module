@@ -34,7 +34,11 @@ func main() {
 				case r := <-produce:
 					if r.Err != nil {
 						log.Println(r.Err)
-						return
+						if _, ok := r.Err.(*DistributionError); ok {
+							continue
+						} else {
+							return
+						}
 					}
 					log.Println(r.Distribution.AsJSON())
 					if !r.Distribution.IsPerl6 {
