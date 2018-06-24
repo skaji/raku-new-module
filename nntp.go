@@ -46,6 +46,7 @@ func (n *NNTP) Tail(ctx context.Context) <-chan *Result {
 		client, err := nntpclient.New("tcp", fmt.Sprintf("%s:%d", n.Server, 119))
 		if err != nil {
 			ch <- &Result{Err: err}
+			close(ch)
 			return
 		}
 		group, err := client.Group(n.Group)
