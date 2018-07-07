@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
+	"net/mail"
 	"strconv"
 	"time"
 
@@ -55,15 +55,15 @@ func (n *NNTP) Tail(ctx context.Context) <-chan *Result {
 		}
 
 		readBody := func(client *nntpclient.Client, ID int64) (*Distribution, error) {
-			_, _, r, err := client.Body(strconv.FormatInt(ID, 10))
+			_, _, r, err := client.Article(strconv.FormatInt(ID, 10))
 			if err != nil {
 				return nil, err
 			}
-			body, err := ioutil.ReadAll(r)
+			m, err := mail.ReadMessage(r)
 			if err != nil {
 				return nil, err
 			}
-			distribution, err := NewDistribution(string(body))
+			distribution, err := NewDistribution(m.Header.Get("Subject"))
 			if err != nil {
 				return nil, err
 			}
