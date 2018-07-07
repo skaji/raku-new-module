@@ -4,4 +4,4 @@ go:
   - 1.10.x
 install:
   - curl -sSL https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-  - dep ensure
+  - dep ensure -v
