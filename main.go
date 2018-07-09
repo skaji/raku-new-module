@@ -2,66 +2,79 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
-	"time"
+
+	"github.com/skaji/perl6-cpan-new/stream"
+	"github.com/skaji/perl6-cpan-new/twitter"
 )
 
-func init() {
-	log.SetFlags(log.LstdFlags | log.Llongfile)
+type config struct {
+	ConsumerKey    string `json:"consumer_key"`
+	ConsumerSecret string `json:"consumer_secret"`
+	AccessToken    string `json:"access_token"`
+	AccessSecret   string `json:"access_secret"`
+	Host           string `json:"host"`
+	Port           int    `json:"port"`
+	Tick           int    `json:"tick"`
+}
+
+func loadConfig(file string) (*config, error) {
+	content, err := ioutil.ReadFile(file)
+	if err != nil {
+		return nil, err
+	}
+	var c config
+	if err := json.Unmarshal(content, &c); err != nil {
+		return nil, err
+	}
+	return &c, nil
 }
 
 func main() {
+	log.SetFlags(log.LstdFlags | log.Llongfile)
 	log.Println("start")
-	twitter, err := NewTwitter("./config.json")
+	run()
+	log.Println("finish")
+}
+
+func run() {
+	c, err := loadConfig("./config.json")
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	var tw *twitter.Client
+	if c.ConsumerKey != "" {
+		tw = twitter.New(c.ConsumerKey, c.ConsumerSecret, c.AccessToken, c.AccessSecret)
+	}
+
 	sig := make(chan os.Signal)
 	signal.Notify(sig, syscall.SIGTERM, syscall.SIGINT)
-	for {
-		done := false
-		func() {
-			nntp := NewNNTP("nntp.perl.org", "perl.cpan.uploads")
-			ctx, cancel := context.WithCancel(context.Background())
-			defer cancel()
-			produce := nntp.Tail(ctx)
-			for {
-				select {
-				case r := <-produce:
-					if r.Err != nil {
-						log.Println(r.Err)
-						if _, ok := r.Err.(*DistributionError); ok {
-							continue
-						} else {
-							return
-						}
-					}
-					log.Println(r.Distribution.AsJSON())
-					if !r.Distribution.IsPerl6 {
-						continue
-					}
-					_, _, err := twitter.Statuses.Update(r.Distribution.Summary(), nil)
-					if err != nil {
-						log.Println(err)
-						continue
-					}
-				case s := <-sig:
-					log.Printf("catch %v\n", s)
-					done = true
-					return
-				}
 
+	ctx, cancel := context.WithCancel(context.Background())
+	stream := stream.NewPerl6(ctx, c.Host, c.Port, c.Tick)
+
+	for {
+		select {
+		case dist := <-stream:
+			summary := dist.Summary()
+			log.Print("tweet ", strings.Replace(summary, "\n", " ", -1))
+			if tw != nil {
+				err := tw.Tweet(summary)
+				if err != nil {
+					log.Println(err)
+				}
 			}
-		}()
-		if done {
-			break
+		case s := <-sig:
+			log.Printf("catch %v\n", s)
+			cancel()
+			return
 		}
-		log.Println("Retry after 60sec...")
-		time.Sleep(60 * time.Second)
 	}
-	log.Println("finish")
 }
