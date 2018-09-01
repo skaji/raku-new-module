@@ -1,5 +1,8 @@
 language: go
 sudo: false
+env:
+  global:
+    - PERL6_CPAN_NEW_RETRY_INTERVAL=1
 go:
   - 1.10.x
 install:

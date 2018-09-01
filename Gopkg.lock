@@ -11,7 +11,7 @@
   branch = "master"
   name = "github.com/dghubble/go-twitter"
   packages = ["twitter"]
-  revision = "093ee2cf4e32ef608cded0ace84d5d82a52da4fa"
+  revision = "a34e9059cd58e96429cee9c8a87fd8d907da6843"
 
 [[projects]]
   name = "github.com/dghubble/oauth1"
@@ -44,7 +44,7 @@
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context"]
-  revision = "32a936f46389aa10549d60bd7833e54b01685d09"
+  revision = "8a410e7b638dca158bf9e766925842f6651ff828"
 
 [solve-meta]
   analyzer-name = "dep"
