@@ -49,10 +49,6 @@ func NewPerl6(ctx context.Context, host string, port int, tick int) <-chan *dist
 		nntpChannel := nntpClient.Tail(ctx)
 
 		for article := range nntpChannel {
-			if article.Error != nil {
-				log.Print(article.Error)
-				continue
-			}
 			msg, err := mail.ReadMessage(bytes.NewReader(article.Article))
 			if err != nil {
 				log.Print(err)
@@ -64,7 +60,7 @@ func NewPerl6(ctx context.Context, host string, port int, tick int) <-chan *dist
 				log.Print(err)
 				continue
 			}
-			log.Print(dist.AsJSON())
+			log.Print(article.ID, " ", dist.AsJSON())
 			if dist.IsPerl6 {
 				go func() {
 					fixPerl6Distribution(ctx, dist)

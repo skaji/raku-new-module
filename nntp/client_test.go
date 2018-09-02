@@ -22,20 +22,16 @@ func TestNNTP(t *testing.T) {
 		cancel()
 	}()
 	ch := nntp.Tail(ctx)
-	fail := 0
+	count := 0
 	for article := range ch {
-		if article.Error != nil {
-			fail++
-			continue
-		}
 		message, err := mail.ReadMessage(bytes.NewReader(article.Article))
 		if err != nil {
-			fail++
 			continue
 		}
 		fmt.Println(message.Header.Get("Subject"))
+		count++
 	}
-	if fail > 1 {
+	if count < 5 {
 		t.Fatal("fail")
 	}
 }

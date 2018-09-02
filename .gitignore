@@ -1,4 +1,5 @@
 perl6-cpan-new
 *.json
+!_test_config.json
 vendor/
 _test_server/_test_server

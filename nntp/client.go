@@ -15,7 +15,7 @@ import (
 // Article is
 type Article struct {
 	Article []byte
-	Error   error
+	ID      string
 }
 
 // Client is
@@ -77,6 +77,8 @@ func (c *Client) reconnect() error {
 
 // Close is
 func (c *Client) Close() error {
+	c.previousID = -1
+	c.currentID = -1
 	return c.backend.Close()
 }
 
@@ -92,38 +94,45 @@ func (c *Client) Tail(ctx context.Context) <-chan *Article {
 			select {
 			case <-ticker.C:
 				if reconnect && c.Reconnect {
-					reconnect = false
-					log.Println("reconnecting...")
+					log.Println("try to reconnect...")
 					if err := c.reconnect(); err != nil {
-						ch <- &Article{Error: err}
-						reconnect = true
+						log.Println("NG reconnect, ", err)
 						continue
 					}
+					log.Println("OK reconnect")
+					reconnect = false
+					// pass through
 				}
 				group, err := c.backend.Group(c.Group)
 				if err != nil {
-					ch <- &Article{Error: err}
+					log.Println(err)
 					reconnect = true
 					continue
 				}
 				c.currentID = group.High
 				if c.previousID == -1 {
-					c.previousID = c.currentID + c.Offset
+					if c.currentID+c.Offset >= 0 {
+						c.previousID = c.currentID + c.Offset
+					} else {
+						c.previousID = 0
+					}
 				}
 
 				for i := c.previousID + 1; i <= c.currentID; i++ {
 					var err error
 					var r io.Reader
 					var article []byte
-					_, _, r, err = c.backend.Article(strconv.FormatInt(i, 10))
+
+					ID := strconv.FormatInt(i, 10)
+					_, _, r, err = c.backend.Article(ID)
 					if err == nil {
 						article, err = ioutil.ReadAll(r)
 						if err == nil {
-							ch <- &Article{Article: article}
+							ch <- &Article{Article: article, ID: ID}
 							continue
 						}
 					}
-					ch <- &Article{Error: err}
+					log.Println(err)
 					reconnect = true
 				}
 				c.previousID = c.currentID

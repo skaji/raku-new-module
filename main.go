@@ -36,19 +36,26 @@ func loadConfig(file string) (*config, error) {
 	return &c, nil
 }
 
-func main() {
+func init() {
 	log.SetFlags(log.LstdFlags | log.Llongfile)
-	log.Println("start")
-	run()
-	log.Println("finish")
 }
 
-func run() {
-	c, err := loadConfig("./config.json")
+func main() {
+	configfile := "./_test_config.json"
+	if len(os.Args) > 1 {
+		configfile = os.Args[1]
+	}
+	c, err := loadConfig(configfile)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	log.Println("start")
+	run(c)
+	log.Println("finish")
+}
+
+func run(c *config) {
 	var tw *twitter.Client
 	if c.ConsumerKey != "" {
 		tw = twitter.New(c.ConsumerKey, c.ConsumerSecret, c.AccessToken, c.AccessSecret)
