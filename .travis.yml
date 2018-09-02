@@ -3,8 +3,6 @@ sudo: false
 env:
   global:
     - PERL6_CPAN_NEW_RETRY_INTERVAL=1
+    - GO111MODULE=on
 go:
-  - 1.10.x
-install:
-  - curl -sSL https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-  - dep ensure -v
+  - 1.11.x
