@@ -58,6 +58,7 @@ func main() {
 func run(c *config) {
 	var tw *twitter.Client
 	if c.ConsumerKey != "" {
+		log.Println("will tweet with ConsumerKey ", c.ConsumerKey)
 		tw = twitter.New(c.ConsumerKey, c.ConsumerSecret, c.AccessToken, c.AccessSecret)
 	}
 
@@ -65,11 +66,12 @@ func run(c *config) {
 	signal.Notify(sig, syscall.SIGTERM, syscall.SIGINT)
 
 	ctx, cancel := context.WithCancel(context.Background())
-	stream := stream.NewPerl6(ctx, c.Host, c.Port, c.Tick)
+	defer cancel()
+	strm := stream.NewPerl6(ctx, c.Host, c.Port, c.Tick)
 
 	for {
 		select {
-		case dist := <-stream:
+		case dist := <-strm:
 			summary := dist.Summary()
 			log.Print("tweet ", strings.Replace(summary, "\n", " ", -1))
 			if tw != nil {
@@ -80,7 +82,6 @@ func run(c *config) {
 			}
 		case s := <-sig:
 			log.Printf("catch %v\n", s)
-			cancel()
 			return
 		}
 	}
