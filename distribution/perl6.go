@@ -9,21 +9,17 @@ import (
 	"net/http"
 )
 
-// RetryableError is
 type RetryableError struct {
 	Message string
 }
 
-// RetryableError is
 func (e *RetryableError) Error() string {
 	return e.Message
 }
 
-// Perl6Fetcher is
 type Perl6Fetcher struct {
 }
 
-// NewPerl6Fetcher is
 func NewPerl6Fetcher() *Perl6Fetcher {
 	return &Perl6Fetcher{}
 }
@@ -67,7 +63,6 @@ type perl6Meta struct {
 	Name string `json:"name"`
 }
 
-// FetchName is
 func (f *Perl6Fetcher) FetchName(ctx context.Context, d *Distribution) (string, error) {
 	if !d.IsPerl6 {
 		panic("not perl6!")

@@ -10,7 +10,6 @@ import (
 var distributionRegexp = regexp.MustCompile(`[^/]/[^/]{2}/([^/]+)/(Perl6/)?([^/]+)\.(?:tar\.gz|tar\.bz2|zip|tgz)`)
 var versionRegexp = regexp.MustCompile(`^v?[\d_.]+$`)
 
-// Error is
 type Error struct {
 	Message string
 }
@@ -19,7 +18,6 @@ func (d *Error) Error() string {
 	return d.Message
 }
 
-// Distribution is
 type Distribution struct {
 	CPANID     string `json:"cpanid"`
 	Distvname  string `json:"distvname"`
@@ -29,7 +27,6 @@ type Distribution struct {
 	Pathname   string `json:"pathname"`
 }
 
-// New is
 func New(str string) (*Distribution, error) {
 	res := distributionRegexp.FindAllStringSubmatch(str, -1)
 	if len(res) == 0 {
@@ -62,7 +59,6 @@ func New(str string) (*Distribution, error) {
 	return &d, nil
 }
 
-// Summary is
 func (d *Distribution) Summary() string {
 	var url string
 	if d.IsPerl6 {
@@ -73,7 +69,6 @@ func (d *Distribution) Summary() string {
 	return fmt.Sprintf("%s by %s\n%s", d.Distvname, d.CPANID, url)
 }
 
-// AsJSON is
 func (d *Distribution) AsJSON() string {
 	bytes, err := json.Marshal(d)
 	if err != nil {

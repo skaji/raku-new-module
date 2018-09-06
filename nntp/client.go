@@ -12,13 +12,11 @@ import (
 	"github.com/dustin/go-nntp/client"
 )
 
-// Article is
 type Article struct {
 	Article []byte
 	ID      string
 }
 
-// Client is
 type Client struct {
 	Group      string
 	Host       string
@@ -31,7 +29,6 @@ type Client struct {
 	previousID int64
 }
 
-// NewClient is
 func NewClient(host string, port int, group string, tick int) (*Client, error) {
 	backend, err := connect(host, port, group)
 	if err != nil {
@@ -75,14 +72,12 @@ func (c *Client) reconnect() error {
 	return nil
 }
 
-// Close is
 func (c *Client) Close() error {
 	c.previousID = -1
 	c.currentID = -1
 	return c.backend.Close()
 }
 
-// Tail is
 func (c *Client) Tail(ctx context.Context) <-chan *Article {
 	ch := make(chan *Article)
 	go func() {

@@ -36,7 +36,6 @@ func fixPerl6Distribution(ctx context.Context, d *distribution.Distribution) {
 	}
 }
 
-// NewPerl6 is
 func NewPerl6(ctx context.Context, host string, port int, tick int) <-chan *distribution.Distribution {
 	ch := make(chan *distribution.Distribution)
 	go func() {
