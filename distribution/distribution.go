@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-var distributionRegexp = regexp.MustCompile(`[^/]/[^/]{2}/([^/]+)/(Perl6/)?([^/]+)\.(?:tar\.gz|tar\.bz2|zip|tgz)`)
+var distributionRegexp = regexp.MustCompile(`[^/]/[^/]{2}/([^/]{3,})/(Perl6/)?([^/]+)\.(?:tar\.gz|tar\.bz2|zip|tgz)`)
 var versionRegexp = regexp.MustCompile(`^v?[\d_.]+$`)
 
 type Error struct {
@@ -75,4 +75,14 @@ func (d *Distribution) AsJSON() string {
 		panic(err)
 	}
 	return string(bytes)
+}
+
+func (d *Distribution) MetaURL() string {
+	return fmt.Sprintf(
+		"https://cpan.metacpan.org/authors/id/%s/%s/%s/Perl6/%s.meta",
+		string(d.CPANID[0:1]),
+		string(d.CPANID[0:2]),
+		d.CPANID,
+		d.Distvname,
+	)
 }

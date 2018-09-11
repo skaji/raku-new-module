@@ -24,16 +24,8 @@ func NewPerl6Fetcher() *Perl6Fetcher {
 	return &Perl6Fetcher{}
 }
 
-func (f *Perl6Fetcher) fetchMeta(ctx context.Context, d *Distribution) ([]byte, error) {
-	url := fmt.Sprintf(
-		"https://cpan.metacpan.org/authors/id/%s/%s/%s/Perl6/%s.meta",
-		string(d.CPANID[0:1]),
-		string(d.CPANID[0:2]),
-		d.CPANID,
-		d.Distvname,
-	)
-
-	req, err := http.NewRequest("GET", url, nil)
+func (f *Perl6Fetcher) fetchMeta(ctx context.Context, metaURL string) ([]byte, error) {
+	req, err := http.NewRequest("GET", metaURL, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +41,7 @@ func (f *Perl6Fetcher) fetchMeta(ctx context.Context, d *Distribution) ([]byte, 
 		return nil, err
 	}
 
-	msg := fmt.Sprintf("%s, %s", res.Status, url)
+	msg := fmt.Sprintf("%s, %s", res.Status, metaURL)
 	if res.StatusCode == http.StatusOK {
 		return body, nil
 	} else if res.StatusCode == http.StatusNotFound {
@@ -63,14 +55,8 @@ type perl6Meta struct {
 	Name string `json:"name"`
 }
 
-func (f *Perl6Fetcher) FetchName(ctx context.Context, d *Distribution) (string, error) {
-	if !d.IsPerl6 {
-		panic("not perl6!")
-	}
-	if len(d.CPANID) < 2 {
-		return "", errors.New("too short CPANID")
-	}
-	body, err := f.fetchMeta(ctx, d)
+func (f *Perl6Fetcher) FetchName(ctx context.Context, metaURL string) (string, error) {
+	body, err := f.fetchMeta(ctx, metaURL)
 	if err != nil {
 		return "", err
 	}

@@ -12,7 +12,7 @@ func TestPerl6(t *testing.T) {
 
 	fetcher := NewPerl6Fetcher()
 	d, _ = New("CPAN Upload: E/EL/ELIZABETH/Perl6/Hash-with-0.0.1.tar.gz")
-	name, err = fetcher.FetchName(context.Background(), d)
+	name, err = fetcher.FetchName(context.Background(), d.MetaURL())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -21,7 +21,7 @@ func TestPerl6(t *testing.T) {
 	}
 
 	d, _ = New("CPAN Upload: J/JN/JNTHN/Perl6/cro-zeromq-0.7.6.tar.gz")
-	name, err = fetcher.FetchName(context.Background(), d)
+	name, err = fetcher.FetchName(context.Background(), d.MetaURL())
 	if err != nil {
 		t.Fatal(err)
 	}
