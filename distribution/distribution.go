@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-var distributionRegexp = regexp.MustCompile(`[^/]/[^/]{2}/([^/]{3,})/(Perl6/)?([^/]+)\.(?:tar\.gz|tar\.bz2|zip|tgz)`)
+var distributionRegexp = regexp.MustCompile(`[^/]/[^/]{2}/([^/]{2,})/(Perl6/)?([^/]+)\.(?:tar\.gz|tar\.bz2|zip|tgz)`)
 var versionRegexp = regexp.MustCompile(`^v?[\d_.]+$`)
 
 type Error struct {
