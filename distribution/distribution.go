@@ -25,9 +25,10 @@ type Distribution struct {
 	MainModule string `json:"main_module"`
 	IsPerl6    bool   `json:"perl6"`
 	Pathname   string `json:"pathname"`
+	ID         string `json:"-"`
 }
 
-func New(str string) (*Distribution, error) {
+func New(id string, str string) (*Distribution, error) {
 	res := distributionRegexp.FindAllStringSubmatch(str, -1)
 	if len(res) == 0 {
 		msg := fmt.Sprintf("failed to parse string '%s'", str)
@@ -40,6 +41,7 @@ func New(str string) (*Distribution, error) {
 		Distvname: r[3], // App-cpm-0.987
 		Pathname:  r[0], // S/SK/SKAJI/App-cpm-0.987.tar.gz
 		IsPerl6:   r[2] == "Perl6/",
+		ID:        id,
 	}
 
 	parts := strings.Split(d.Distvname, "-")

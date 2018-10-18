@@ -24,3 +24,4 @@ CPAN Upload: G/GF/GFRANKS/Test-MockModule-0.16.tar.gz
 CPAN Upload: T/TA/TANIGUCHI/Number-ZipCode-JP-0.20180901.tar.gz
 CPAN Upload: J/JN/JNTHN/Perl6/cro-zeromq-0.7.6.tar.gz
 CPAN UploaBROKEN
+CPAN Upload: H/HO/HOLYGHOST/Perl6/Perl6-Bayes-Learn-0.1.1.tar.gz

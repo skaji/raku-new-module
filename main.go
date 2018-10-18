@@ -73,11 +73,11 @@ func run(c *config) {
 		select {
 		case dist := <-strm:
 			summary := dist.Summary()
-			log.Print("tweet ", strings.Replace(summary, "\n", " ", -1))
+			log.Println(dist.ID, "tweet", strings.Replace(summary, "\n", " ", -1))
 			if tw != nil {
 				err := tw.Tweet(summary)
 				if err != nil {
-					log.Println(err)
+					log.Println(dist.ID, err)
 				}
 			}
 		case s := <-sig:
