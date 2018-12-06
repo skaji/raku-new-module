@@ -81,6 +81,7 @@ func (c *Client) Close() error {
 func (c *Client) Tail(ctx context.Context) <-chan *Article {
 	ch := make(chan *Article)
 	go func() {
+		defer close(ch)
 		ticker := time.NewTicker(c.Tick)
 		defer ticker.Stop()
 
@@ -132,7 +133,6 @@ func (c *Client) Tail(ctx context.Context) <-chan *Article {
 				}
 				c.previousID = c.currentID
 			case <-ctx.Done():
-				close(ch)
 				return
 			}
 		}
