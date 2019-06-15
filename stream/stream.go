@@ -51,6 +51,7 @@ func NewPerl6(ctx context.Context, host string, port int, tick int) <-chan *dist
 		defer nntpClient.Close()
 
 		nntpChannel := nntpClient.Tail(ctx)
+		seen := make(map[string]bool)
 
 		for article := range nntpChannel {
 			id := article.ID
@@ -70,6 +71,11 @@ func NewPerl6(ctx context.Context, host string, port int, tick int) <-chan *dist
 			if !dist.IsPerl6 {
 				continue
 			}
+			if seen[id] {
+				log.Println(id, "Already seen "+id+", skip")
+				continue
+			}
+			seen[id] = true
 
 			go func(id string) {
 				err := fixPerl6Distribution(ctx, dist)
