@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"strconv"
 	"time"
 
 	"github.com/dustin/go-nntp/client"
+	"github.com/skaji/perl6-cpan-new/pkg/log"
 )
 
 // Article is

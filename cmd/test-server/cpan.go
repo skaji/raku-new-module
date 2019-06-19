@@ -1,4 +1,6 @@
-CPAN Upload: M/MI/MIK/Crypt-JWT-0.023.tar.gz
+package main
+
+var cpanText = `CPAN Upload: M/MI/MIK/Crypt-JWT-0.023.tar.gz
 CPAN Upload: J/JM/JMATES/Game-DijkstraMap-0.02.tar.gz
 CPAN Upload: F/FE/FELIPE/Linux-Perl-0.13.tar.gz
 CPAN Upload: W/WY/WYANT/Astro-Coord-ECI-TLE-Iridium-0.104_02.tar.gz
@@ -25,3 +27,4 @@ CPAN Upload: T/TA/TANIGUCHI/Number-ZipCode-JP-0.20180901.tar.gz
 CPAN Upload: J/JN/JNTHN/Perl6/cro-zeromq-0.7.6.tar.gz
 CPAN UploaBROKEN
 CPAN Upload: H/HO/HOLYGHOST/Perl6/Perl6-Bayes-Learn-0.1.1.tar.gz
+`

@@ -1,13 +1,10 @@
 package main
 
 import (
-	"bufio"
 	"container/ring"
 	"context"
 	"errors"
-	"log"
 	"net/textproto"
-	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -53,18 +50,7 @@ func NewBackend(ctx context.Context) *Backend {
 }
 
 func (b *Backend) post(ctx context.Context) {
-	file, err := os.Open("./cpan.txt")
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	lines := []string{}
-	s := bufio.NewScanner(file)
-	for s.Scan() {
-		lines = append(lines, s.Text())
-	}
-	file.Close()
-
+	lines := strings.Split(cpanText, "\n")
 	r := ring.New(len(lines))
 	for i := 0; i < len(lines); i++ {
 		r.Value = lines[i]

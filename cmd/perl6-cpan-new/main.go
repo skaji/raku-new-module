@@ -4,14 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
 
-	"github.com/skaji/perl6-cpan-new/stream"
-	"github.com/skaji/perl6-cpan-new/twitter"
+	"github.com/skaji/perl6-cpan-new/pkg/log"
+	"github.com/skaji/perl6-cpan-new/pkg/stream"
+	"github.com/skaji/perl6-cpan-new/pkg/twitter"
 )
 
 type config struct {
@@ -22,6 +22,7 @@ type config struct {
 	Host           string `json:"host"`
 	Port           int    `json:"port"`
 	Tick           int    `json:"tick"`
+	SlackURL       string `json:"slack_url"`
 }
 
 func loadConfig(file string) (*config, error) {
@@ -36,10 +37,6 @@ func loadConfig(file string) (*config, error) {
 	return &c, nil
 }
 
-func init() {
-	log.SetFlags(log.LstdFlags | log.Llongfile)
-}
-
 func main() {
 	configfile := "./_test_config.json"
 	if len(os.Args) > 1 {
@@ -48,6 +45,9 @@ func main() {
 	c, err := loadConfig(configfile)
 	if err != nil {
 		log.Fatal(err)
+	}
+	if c.SlackURL != "" {
+		log.Set(log.NewSlack(c.SlackURL))
 	}
 
 	log.Println("start")
@@ -58,7 +58,7 @@ func main() {
 func run(c *config) {
 	var tw *twitter.Client
 	if c.ConsumerKey != "" {
-		log.Println("will tweet with ConsumerKey ", c.ConsumerKey)
+		log.Println("will tweet with ConsumerKey", c.ConsumerKey)
 		tw = twitter.New(c.ConsumerKey, c.ConsumerSecret, c.AccessToken, c.AccessSecret)
 	}
 

@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"log"
 	"net/mail"
 	"time"
 
-	"github.com/skaji/perl6-cpan-new/distribution"
-	"github.com/skaji/perl6-cpan-new/nntp"
+	"github.com/skaji/perl6-cpan-new/pkg/distribution"
+	"github.com/skaji/perl6-cpan-new/pkg/log"
+	"github.com/skaji/perl6-cpan-new/pkg/nntp"
 )
 
 func fixPerl6Distribution(ctx context.Context, d *distribution.Distribution) error {
