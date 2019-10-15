@@ -9,7 +9,6 @@ import (
 	"net/http"
 )
 
-// RetryableError is
 type RetryableError struct {
 	Message string
 }
@@ -18,11 +17,9 @@ func (e *RetryableError) Error() string {
 	return e.Message
 }
 
-// Perl6Fetcher is
 type Perl6Fetcher struct {
 }
 
-// NewPerl6Fetcher is
 func NewPerl6Fetcher() *Perl6Fetcher {
 	return &Perl6Fetcher{}
 }
@@ -58,7 +55,6 @@ type perl6Meta struct {
 	Name string `json:"name"`
 }
 
-// FetchName is
 func (f *Perl6Fetcher) FetchName(ctx context.Context, metaURL string) (string, error) {
 	body, err := f.fetchMeta(ctx, metaURL)
 	if err != nil {

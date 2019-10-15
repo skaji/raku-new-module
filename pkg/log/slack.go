@@ -14,14 +14,12 @@ import (
 	"time"
 )
 
-// SlackLogger is
 type SlackLogger struct {
 	url string
 	ch  chan string
 	*base.Logger
 }
 
-// NewSlack is
 func NewSlack(url string) Logger {
 	l := &SlackLogger{
 		url:    url,
@@ -32,24 +30,20 @@ func NewSlack(url string) Logger {
 	return l
 }
 
-// Fatal is
 func (l *SlackLogger) Fatal(v ...interface{}) {
 	l.Logger.Fatal(v...)
 }
 
-// Printf is
 func (l *SlackLogger) Printf(format string, v ...interface{}) {
 	l.Post(fmt.Sprintf(format, v...))
 	l.Logger.Printf(format, v...)
 }
 
-// Println is
 func (l *SlackLogger) Println(v ...interface{}) {
 	l.Post(fmt.Sprintln(v...))
 	l.Logger.Println(v...)
 }
 
-// Post is
 func (l *SlackLogger) Post(text string) {
 	select {
 	case l.ch <- text:

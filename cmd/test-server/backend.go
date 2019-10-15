@@ -26,14 +26,12 @@ func newArticle(subject string) *nntp.Article {
 	}
 }
 
-// Backend is
 type Backend struct {
 	Group    *nntp.Group
 	Articles []*nntp.Article
 	mux      sync.Mutex
 }
 
-// NewBackend is
 func NewBackend(ctx context.Context) *Backend {
 	backend := &Backend{
 		Group: &nntp.Group{
@@ -78,12 +76,10 @@ func (b *Backend) post(ctx context.Context) {
 	}
 }
 
-// ListGroups is
 func (b *Backend) ListGroups(max int) ([]*nntp.Group, error) {
 	return nil, nil
 }
 
-// GetGroup is
 func (b *Backend) GetGroup(name string) (*nntp.Group, error) {
 	b.mux.Lock()
 	defer b.mux.Unlock()
@@ -93,7 +89,6 @@ func (b *Backend) GetGroup(name string) (*nntp.Group, error) {
 	return b.Group, nil
 }
 
-// GetArticle is
 func (b *Backend) GetArticle(group *nntp.Group, id string) (*nntp.Article, error) {
 	b.mux.Lock()
 	defer b.mux.Unlock()
@@ -110,27 +105,22 @@ func (b *Backend) GetArticle(group *nntp.Group, id string) (*nntp.Article, error
 	return b.Articles[i], nil
 }
 
-// GetArticles is
 func (b *Backend) GetArticles(group *nntp.Group, from, to int64) ([]nntpserver.NumberedArticle, error) {
 	return nil, nil
 }
 
-// Authorized is
 func (b *Backend) Authorized() bool {
 	return true
 }
 
-// Authenticate is
 func (b *Backend) Authenticate(user, pass string) (nntpserver.Backend, error) {
 	return nil, nil
 }
 
-// AllowPost is
 func (b *Backend) AllowPost() bool {
 	return true
 }
 
-// Post is
 func (b *Backend) Post(article *nntp.Article) error {
 	return nil
 }
