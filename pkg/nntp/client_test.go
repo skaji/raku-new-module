@@ -3,32 +3,25 @@ package nntp
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"net/mail"
 	"testing"
 	"time"
+
+	"github.com/skaji/perl6-cpan-new/pkg/log"
 )
 
 func TestNNTP(t *testing.T) {
-	nntp, err := NewClient("nntp.perl.org", 119, "perl.cpan.uploads", 5)
-	if err != nil {
-		panic(err)
-	}
-	nntp.Offset = -5
-	nntp.Tick = time.Second
-	ctx, cancel := context.WithCancel(context.Background())
-	go func() {
-		time.Sleep(time.Second * 2)
-		cancel()
-	}()
-	ch := nntp.Tail(ctx)
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	ch := Tail(ctx, "nntp.perl.org:119", "perl.cpan.uploads", 2*time.Second, -5)
 	count := 0
 	for article := range ch {
 		message, err := mail.ReadMessage(bytes.NewReader(article.Article))
 		if err != nil {
 			continue
 		}
-		fmt.Println(message.Header.Get("Subject"))
+		log.Println(message.Header.Get("Subject"))
 		count++
 	}
 	if count < 5 {

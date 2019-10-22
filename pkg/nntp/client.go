@@ -3,13 +3,17 @@ package nntp
 import (
 	"context"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"strconv"
 	"time"
 
-	"github.com/dustin/go-nntp/client"
+	nntpclient "github.com/skaji/go-nntp/client"
 	"github.com/skaji/perl6-cpan-new/pkg/log"
+)
+
+var (
+	aLongTimeAgo = time.Unix(1, 0)
+	noTimeout    = time.Time{}
 )
 
 type Article struct {
@@ -17,125 +21,80 @@ type Article struct {
 	ID      string
 }
 
-type Client struct {
-	Group      string
-	Host       string
-	Port       int
-	Tick       time.Duration
-	Offset     int64 // where to read
-	Reconnect  bool
-	backend    *nntpclient.Client
-	currentID  int64
-	previousID int64
-}
-
-func NewClient(host string, port int, group string, tick int) (*Client, error) {
-	backend, err := connect(host, port, group)
-	if err != nil {
-		return nil, err
-	}
-	if tick == 0 {
-		tick = 30
-	}
-	return &Client{
-		backend:    backend,
-		Host:       host,
-		Port:       port,
-		Group:      group,
-		Tick:       time.Duration(tick) * time.Second,
-		Offset:     0,
-		Reconnect:  true,
-		previousID: -1,
-		currentID:  -1,
-	}, nil
-}
-
-func connect(host string, port int, group string) (*nntpclient.Client, error) {
-	backend, err := nntpclient.New("tcp", fmt.Sprintf("%s:%d", host, port))
-	if err != nil {
-		return nil, err
-	}
-	// first time check
-	if _, err := backend.Group(group); err != nil {
-		return nil, err
-	}
-	return backend, nil
-}
-
-func (c *Client) reconnect() error {
-	c.Close()
-	backend, err := connect(c.Host, c.Port, c.Group)
-	if err != nil {
-		return err
-	}
-	c.backend = backend
-	return nil
-}
-
-func (c *Client) Close() error {
-	c.previousID = -1
-	c.currentID = -1
-	return c.backend.Close()
-}
-
-func (c *Client) Tail(ctx context.Context) <-chan *Article {
+func Tail(globalCtx context.Context, addr string, group string, tick time.Duration, offset int64) <-chan *Article {
 	ch := make(chan *Article)
+
 	go func() {
 		defer close(ch)
-		ticker := time.NewTicker(c.Tick)
-		defer ticker.Stop()
 
-		reconnect := false
+		var (
+			client     *nntpclient.Client
+			previousID int64 = -1
+			currentID  int64
+		)
+
+		oneTick := func(ctx context.Context) error {
+			if client == nil {
+				var err error
+				client, err = nntpclient.New(ctx, "tcp", addr)
+				if err != nil {
+					return fmt.Errorf("nntp connect: %w", err)
+				}
+				log.Println("connect OK")
+			}
+
+			cancel := client.SetContext(ctx)
+			defer cancel()
+			g, err := client.Group(group)
+			if err != nil {
+				return fmt.Errorf("nntp read group: %w", err)
+			}
+			currentID = g.High
+			log.Debugf("%d %s high", g.High, group)
+			if previousID == -1 {
+				previousID = currentID + offset
+			}
+			for i := previousID + 1; i <= currentID; i++ {
+				ID := strconv.FormatInt(i, 10)
+				_, _, r, err := client.Article(ID)
+				if err != nil {
+					return fmt.Errorf("nntp read article: %w", err)
+				}
+				article, err := ioutil.ReadAll(r)
+				if err != nil {
+					return fmt.Errorf("nntp read article body: %w", err)
+				}
+				ch <- &Article{Article: article, ID: ID}
+			}
+			previousID = currentID
+			return nil
+		}
+		reset := func() {
+			if client != nil {
+				client.Close()
+				client = nil
+			}
+			previousID = -1
+		}
+		defer reset()
+
+		ticker := time.NewTicker(tick)
+		defer ticker.Stop()
 		for {
+			ctx, cancel := context.WithTimeout(context.Background(), 25*time.Second)
+			err := oneTick(ctx)
+			cancel()
+			if err != nil {
+				log.Println(err)
+				reset()
+			}
 			select {
 			case <-ticker.C:
-				if reconnect && c.Reconnect {
-					log.Println("try to reconnect...")
-					if err := c.reconnect(); err != nil {
-						log.Println("NG reconnect, ", err)
-						continue
-					}
-					log.Println("OK reconnect")
-					reconnect = false
-					// pass through
-				}
-				group, err := c.backend.Group(c.Group)
-				if err != nil {
-					log.Println(err)
-					reconnect = true
-					continue
-				}
-				c.currentID = group.High
-				if c.previousID == -1 {
-					if c.currentID+c.Offset >= 0 {
-						c.previousID = c.currentID + c.Offset
-					} else {
-						c.previousID = 0
-					}
-				}
-
-				for i := c.previousID + 1; i <= c.currentID; i++ {
-					var err error
-					var r io.Reader
-					var article []byte
-
-					ID := strconv.FormatInt(i, 10)
-					_, _, r, err = c.backend.Article(ID)
-					if err == nil {
-						article, err = ioutil.ReadAll(r)
-						if err == nil {
-							ch <- &Article{Article: article, ID: ID}
-							continue
-						}
-					}
-					log.Println(err)
-					reconnect = true
-				}
-				c.previousID = c.currentID
-			case <-ctx.Done():
+			case <-globalCtx.Done():
 				return
 			}
 		}
 	}()
 	return ch
+
 }

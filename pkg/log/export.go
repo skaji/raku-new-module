@@ -5,7 +5,10 @@ import (
 	"os"
 )
 
-var logger Logger = base.New(os.Stderr, "", base.LstdFlags|base.Llongfile)
+var logger Logger = &CoreLogger{
+	Level:  3,
+	Logger: base.New(os.Stderr, "", base.LstdFlags|base.Llongfile),
+}
 
 func Set(l Logger) {
 	logger = l
@@ -21,4 +24,12 @@ func Printf(format string, v ...interface{}) {
 
 func Println(v ...interface{}) {
 	logger.Println(v...)
+}
+
+var debug = os.Getenv("DEBUG") != ""
+
+func Debugf(format string, v ...interface{}) {
+	if debug {
+		logger.Printf(format, v...)
+	}
 }

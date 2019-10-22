@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	nntp "github.com/dustin/go-nntp"
-	nntpserver "github.com/dustin/go-nntp/server"
+	nntp "github.com/skaji/go-nntp"
+	nntpserver "github.com/skaji/go-nntp/server"
 )
 
 func newArticle(subject string) *nntp.Article {
