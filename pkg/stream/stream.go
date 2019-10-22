@@ -16,7 +16,9 @@ func fixPerl6Distribution(ctx context.Context, d *distribution.Distribution) err
 	fetcher := distribution.NewPerl6Fetcher()
 	max := 20
 	for i := 1; i <= max; i++ {
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 		name, err := fetcher.FetchName(ctx, d.MetaURL())
+		cancel()
 		if err == nil {
 			if d.MainModule == name {
 				log.Printf("%s guessed MainModule %s matches name in META file", d.ID, d.MainModule)
