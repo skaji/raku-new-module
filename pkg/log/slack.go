@@ -15,16 +15,19 @@ import (
 )
 
 type SlackLogger struct {
-	url string
-	ch  chan string
-	*base.Logger
+	url    string
+	ch     chan string
+	Logger Logger
 }
 
 func NewSlack(url string) Logger {
 	l := &SlackLogger{
-		url:    url,
-		ch:     make(chan string, 1000),
-		Logger: base.New(os.Stderr, "", base.LstdFlags|base.Llongfile),
+		url: url,
+		ch:  make(chan string, 1000),
+		Logger: &CoreLogger{
+			Level:  4,
+			Logger: base.New(os.Stderr, "", base.LstdFlags|base.Llongfile),
+		},
 	}
 	go l.poster()
 	return l

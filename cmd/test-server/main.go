@@ -5,7 +5,7 @@ import (
 	"log"
 	"net"
 
-	nntpserver "github.com/dustin/go-nntp/server"
+	nntpserver "github.com/skaji/go-nntp/server"
 )
 
 func main() {

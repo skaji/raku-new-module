@@ -39,17 +39,12 @@ func fixPerl6Distribution(ctx context.Context, d *distribution.Distribution) err
 	return errors.New("too many retry, give up")
 }
 
-func NewPerl6(ctx context.Context, host string, port int, tick int) <-chan *distribution.Distribution {
+func NewPerl6(ctx context.Context, addr string, tick time.Duration) <-chan *distribution.Distribution {
 	ch := make(chan *distribution.Distribution)
 	go func() {
 		defer close(ch)
-		nntpClient, err := nntp.NewClient(host, port, "perl.cpan.uploads", tick)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer nntpClient.Close()
 
-		nntpChannel := nntpClient.Tail(ctx)
+		nntpChannel := nntp.Tail(ctx, addr, "perl.cpan.uploads", tick, 0)
 		seen := make(map[string]bool)
 
 		for article := range nntpChannel {

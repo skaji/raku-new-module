@@ -2,47 +2,25 @@ package main
 
 import (
 	"context"
-	"encoding/json"
-	"io/ioutil"
+	"fmt"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
 
+	"github.com/skaji/perl6-cpan-new/pkg/config"
 	"github.com/skaji/perl6-cpan-new/pkg/log"
 	"github.com/skaji/perl6-cpan-new/pkg/stream"
 	"github.com/skaji/perl6-cpan-new/pkg/twitter"
 )
 
-type config struct {
-	ConsumerKey    string `json:"consumer_key"`
-	ConsumerSecret string `json:"consumer_secret"`
-	AccessToken    string `json:"access_token"`
-	AccessSecret   string `json:"access_secret"`
-	Host           string `json:"host"`
-	Port           int    `json:"port"`
-	Tick           int    `json:"tick"`
-	SlackURL       string `json:"slack_url"`
-}
-
-func loadConfig(file string) (*config, error) {
-	content, err := ioutil.ReadFile(file)
-	if err != nil {
-		return nil, err
-	}
-	var c config
-	if err := json.Unmarshal(content, &c); err != nil {
-		return nil, err
-	}
-	return &c, nil
-}
-
 func main() {
-	configfile := "./_test_config.json"
-	if len(os.Args) > 1 {
-		configfile = os.Args[1]
+	if len(os.Args) == 1 || os.Args[1] == "-h" || os.Args[1] == "--help" {
+		fmt.Println("Usage: perl6-cpan-new config.json")
+		os.Exit(1)
 	}
-	c, err := loadConfig(configfile)
+	c, err := config.NewFromFile(os.Args[1])
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -55,34 +33,28 @@ func main() {
 	log.Println("finish")
 }
 
-func run(c *config) {
-	var tw *twitter.Client
+func run(c *config.Config) {
+	var tw twitter.Twitter = twitter.NewNoop()
 	if c.ConsumerKey != "" {
 		log.Println("will tweet with ConsumerKey", c.ConsumerKey)
 		tw = twitter.New(c.ConsumerKey, c.ConsumerSecret, c.AccessToken, c.AccessSecret)
 	}
 
-	sig := make(chan os.Signal)
-	signal.Notify(sig, syscall.SIGTERM, syscall.SIGINT)
-
 	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	strm := stream.NewPerl6(ctx, c.Host, c.Port, c.Tick)
+	go func() {
+		sig := make(chan os.Signal, 1)
+		signal.Notify(sig, syscall.SIGTERM, syscall.SIGINT)
+		s := <-sig
+		log.Printf("catch %v\n", s)
+		cancel()
+	}()
 
-	for {
-		select {
-		case dist := <-strm:
-			summary := dist.Summary()
-			log.Println(dist.ID, "tweet", strings.Replace(summary, "\n", " ", -1))
-			if tw != nil {
-				err := tw.Tweet(summary)
-				if err != nil {
-					log.Println(dist.ID, err)
-				}
-			}
-		case s := <-sig:
-			log.Printf("catch %v\n", s)
-			return
+	strm := stream.NewPerl6(ctx, c.Addr, time.Duration(c.Tick)*time.Second)
+	for dist := range strm {
+		summary := dist.Summary()
+		log.Println(dist.ID, "tweet", strings.Replace(summary, "\n", " ", -1))
+		if err := tw.Tweet(summary); err != nil {
+			log.Println(dist.ID, err)
 		}
 	}
 }
