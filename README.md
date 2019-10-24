@@ -1,4 +1,4 @@
-# Perl6 CPAN New [![Build Status](https://travis-ci.com/skaji/perl6-cpan-new.svg?branch=master)](https://travis-ci.com/skaji/perl6-cpan-new)
+# Perl6 CPAN New [![](https://github.com/skaji/perl6-cpan-new/workflows/test/badge.svg)](https://github.com/skaji/perl6-cpan-new/actions)
 
 https://twitter.com/perl6_cpan_new
 
