@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v1
       - name: docker
         run: |
-          TAG=$(echo $GITHUB_REF | perl -F/ -anle 'print $F[1]')
+          TAG=$(echo $GITHUB_REF | perl -F/ -anle 'print $F[2]')
           docker build -t docker.pkg.github.com/skaji/perl6-cpan-new/perl6-cpan-new:$TAG .
           echo '${{ secrets.GITHUB_TOKEN }}' | docker login docker.pkg.github.com -u skaji --password-stdin
           docker push docker.pkg.github.com/skaji/perl6-cpan-new/perl6-cpan-new:$TAG
