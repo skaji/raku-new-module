@@ -8,7 +8,7 @@ import (
 	"time"
 
 	nntpclient "github.com/skaji/go-nntp/client"
-	"github.com/skaji/perl6-cpan-new/pkg/log"
+	"github.com/skaji/raku-cpan-new/pkg/log"
 )
 
 var (

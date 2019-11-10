@@ -20,7 +20,7 @@ func TestDistribution(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !d.IsPerl6 {
+	if !d.IsRaku {
 		t.Fatal("oops")
 	}
 	if d.MainModule != "App::Mi6" {
@@ -31,7 +31,7 @@ func TestDistribution(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if d.IsPerl6 {
+	if d.IsRaku {
 		t.Fatal("oops")
 	}
 
@@ -39,7 +39,7 @@ func TestDistribution(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if d.IsPerl6 {
+	if d.IsRaku {
 		t.Fatal("oops")
 	}
 	if d.Distname != "App-cpm" {
@@ -50,7 +50,7 @@ func TestDistribution(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if d.IsPerl6 {
+	if d.IsRaku {
 		t.Fatal("oops")
 	}
 	if d.Distname != "perl" {

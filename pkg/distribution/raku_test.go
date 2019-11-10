@@ -5,12 +5,12 @@ import (
 	"testing"
 )
 
-func TestPerl6(t *testing.T) {
+func TestRaku(t *testing.T) {
 	var d *Distribution
 	var err error
 	var name string
 
-	fetcher := NewPerl6Fetcher()
+	fetcher := NewRakuFetcher()
 	d, _ = New("id", "CPAN Upload: E/EL/ELIZABETH/Perl6/Hash-with-0.0.1.tar.gz")
 	name, err = fetcher.FetchName(context.Background(), d.MetaURL())
 	if err != nil {

@@ -7,13 +7,13 @@ import (
 	"net/mail"
 	"time"
 
-	"github.com/skaji/perl6-cpan-new/pkg/distribution"
-	"github.com/skaji/perl6-cpan-new/pkg/log"
-	"github.com/skaji/perl6-cpan-new/pkg/nntp"
+	"github.com/skaji/raku-cpan-new/pkg/distribution"
+	"github.com/skaji/raku-cpan-new/pkg/log"
+	"github.com/skaji/raku-cpan-new/pkg/nntp"
 )
 
-func fixPerl6Distribution(ctx context.Context, d *distribution.Distribution) error {
-	fetcher := distribution.NewPerl6Fetcher()
+func fixRakuDistribution(ctx context.Context, d *distribution.Distribution) error {
+	fetcher := distribution.NewRakuFetcher()
 	max := 20
 	for i := 1; i <= max; i++ {
 		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
@@ -41,7 +41,7 @@ func fixPerl6Distribution(ctx context.Context, d *distribution.Distribution) err
 	return errors.New("too many retry, give up")
 }
 
-func NewPerl6(ctx context.Context, addr string, tick time.Duration) <-chan *distribution.Distribution {
+func NewRaku(ctx context.Context, addr string, tick time.Duration) <-chan *distribution.Distribution {
 	ch := make(chan *distribution.Distribution)
 	go func() {
 		defer close(ch)
@@ -64,7 +64,7 @@ func NewPerl6(ctx context.Context, addr string, tick time.Duration) <-chan *dist
 			}
 
 			log.Println(id, dist.AsJSON())
-			if !dist.IsPerl6 {
+			if !dist.IsRaku {
 				continue
 			}
 			if seen[id] {
@@ -74,7 +74,7 @@ func NewPerl6(ctx context.Context, addr string, tick time.Duration) <-chan *dist
 			seen[id] = true
 
 			go func(id string) {
-				err := fixPerl6Distribution(ctx, dist)
+				err := fixRakuDistribution(ctx, dist)
 				if err == nil {
 					ch <- dist
 				} else {

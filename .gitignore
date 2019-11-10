@@ -1,6 +1,6 @@
-/perl6-cpan-new
+/raku-cpan-new
 *.json
 !_test_config.json
 vendor/
 /cmd/test-server/test-server
-/cmd/perl6-cpan-new/perl6-cpan-new
+/cmd/raku-cpan-new/raku-cpan-new
