@@ -1,4 +1,4 @@
-module github.com/skaji/perl6-cpan-new
+module github.com/skaji/raku-cpan-new
 
 go 1.13
 

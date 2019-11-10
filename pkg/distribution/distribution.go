@@ -23,7 +23,7 @@ type Distribution struct {
 	Distvname  string `json:"distvname"`
 	Distname   string `json:"distname"`
 	MainModule string `json:"main_module"`
-	IsPerl6    bool   `json:"perl6"`
+	IsRaku     bool   `json:"raku"`
 	Pathname   string `json:"pathname"`
 	ID         string `json:"-"`
 }
@@ -40,7 +40,7 @@ func New(id string, str string) (*Distribution, error) {
 		CPANID:    r[1], // SKAJI
 		Distvname: r[3], // App-cpm-0.987
 		Pathname:  r[0], // S/SK/SKAJI/App-cpm-0.987.tar.gz
-		IsPerl6:   r[2] == "Perl6/",
+		IsRaku:    r[2] == "Perl6/",
 		ID:        id,
 	}
 
@@ -63,8 +63,8 @@ func New(id string, str string) (*Distribution, error) {
 
 func (d *Distribution) Summary() string {
 	var url string
-	if d.IsPerl6 {
-		url = fmt.Sprintf("https://modules.perl6.org/dist/%s:cpan:%s", d.MainModule, d.CPANID)
+	if d.IsRaku {
+		url = fmt.Sprintf("https://modules.raku.org/dist/%s:cpan:%s", d.MainModule, d.CPANID)
 	} else {
 		url = fmt.Sprintf("https://metacpan.org/release/%s/%s", d.CPANID, d.Distvname)
 	}

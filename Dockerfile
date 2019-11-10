@@ -1,9 +1,9 @@
 FROM golang as builder
-WORKDIR /go/src/github.com/skaji/perl6-cpan-new
+WORKDIR /go/src/github.com/skaji/raku-cpan-new
 COPY go.* ./
 RUN go mod download
 COPY ./ ./
-RUN cd cmd/perl6-cpan-new && go build
+RUN cd cmd/raku-cpan-new && go build
 
 FROM alpine
 RUN set -eux; \
@@ -12,6 +12,6 @@ RUN set -eux; \
   echo Asia/Tokyo > /etc/timezone; \
   apk del tzdata; \
   :
-COPY --from=builder /go/src/github.com/skaji/perl6-cpan-new/cmd/perl6-cpan-new/perl6-cpan-new /perl6-cpan-new
+COPY --from=builder /go/src/github.com/skaji/raku-cpan-new/cmd/raku-cpan-new/raku-cpan-new /raku-cpan-new
 ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["/perl6-cpan-new"]
+CMD ["/raku-cpan-new"]

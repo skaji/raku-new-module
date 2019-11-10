@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/skaji/perl6-cpan-new/pkg/log"
+	"github.com/skaji/raku-cpan-new/pkg/log"
 )
 
 func TestNNTP(t *testing.T) {

@@ -17,14 +17,14 @@ func (e *RetryableError) Error() string {
 	return e.Message
 }
 
-type Perl6Fetcher struct {
+type RakuFetcher struct {
 }
 
-func NewPerl6Fetcher() *Perl6Fetcher {
-	return &Perl6Fetcher{}
+func NewRakuFetcher() *RakuFetcher {
+	return &RakuFetcher{}
 }
 
-func (f *Perl6Fetcher) fetchMeta(ctx context.Context, metaURL string) ([]byte, error) {
+func (f *RakuFetcher) fetchMeta(ctx context.Context, metaURL string) ([]byte, error) {
 	req, err := http.NewRequest("GET", metaURL, nil)
 	if err != nil {
 		return nil, err
@@ -51,16 +51,14 @@ func (f *Perl6Fetcher) fetchMeta(ctx context.Context, metaURL string) ([]byte, e
 	}
 }
 
-type perl6Meta struct {
-	Name string `json:"name"`
-}
-
-func (f *Perl6Fetcher) FetchName(ctx context.Context, metaURL string) (string, error) {
+func (f *RakuFetcher) FetchName(ctx context.Context, metaURL string) (string, error) {
 	body, err := f.fetchMeta(ctx, metaURL)
 	if err != nil {
 		return "", err
 	}
-	var meta perl6Meta
+	var meta struct {
+		Name string `json:"name"`
+	}
 	if err := json.Unmarshal(body, &meta); err != nil {
 		return "", err
 	}
