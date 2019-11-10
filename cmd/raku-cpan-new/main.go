@@ -34,7 +34,7 @@ func main() {
 }
 
 func run(c *config.Config) {
-	var tw twitter.Twitter = twitter.NewNoop()
+	tw := twitter.NewNoop()
 	if c.ConsumerKey != "" {
 		log.Println("will tweet with ConsumerKey", c.ConsumerKey)
 		tw = twitter.New(c.ConsumerKey, c.ConsumerSecret, c.AccessToken, c.AccessSecret)

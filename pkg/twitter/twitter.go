@@ -13,7 +13,7 @@ type Client struct {
 	*orig.Client
 }
 
-func New(consumerKey, consumerSecret, accessToken, accessSecret string) *Client {
+func New(consumerKey, consumerSecret, accessToken, accessSecret string) Twitter {
 	config := oauth1.NewConfig(consumerKey, consumerSecret)
 	token := oauth1.NewToken(accessToken, accessSecret)
 	httpClient := config.Client(oauth1.NoContext, token)
@@ -27,7 +27,7 @@ func (c *Client) Tweet(str string) error {
 
 type NoopClient struct{}
 
-func NewNoop() *NoopClient {
+func NewNoop() Twitter {
 	return &NoopClient{}
 }
 
