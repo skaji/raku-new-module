@@ -71,6 +71,7 @@ func Tail(globalCtx context.Context, addr string, group string, tick time.Durati
 		}
 		reset := func() {
 			if client != nil {
+				log.Println("close connection")
 				client.Close()
 				client = nil
 			}

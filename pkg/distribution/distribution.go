@@ -24,7 +24,6 @@ type Distribution struct {
 	Distname   string `json:"distname"`
 	MainModule string `json:"main_module"`
 	IsRaku     bool   `json:"raku"`
-	Pathname   string `json:"pathname"`
 	ID         string `json:"-"`
 }
 
@@ -39,7 +38,6 @@ func New(id string, str string) (*Distribution, error) {
 	d := Distribution{
 		CPANID:    r[1], // SKAJI
 		Distvname: r[3], // App-cpm-0.987
-		Pathname:  r[0], // S/SK/SKAJI/App-cpm-0.987.tar.gz
 		IsRaku:    r[2] == "Perl6/",
 		ID:        id,
 	}
