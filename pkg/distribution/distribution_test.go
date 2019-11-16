@@ -42,7 +42,7 @@ func TestDistribution(t *testing.T) {
 	if d.IsRaku {
 		t.Fatal("oops")
 	}
-	if d.Distname != "App-cpm" {
+	if d.Distvname != "App-cpm-0.963-TRIAL" {
 		t.Fatal("oops")
 	}
 
@@ -53,7 +53,7 @@ func TestDistribution(t *testing.T) {
 	if d.IsRaku {
 		t.Fatal("oops")
 	}
-	if d.Distname != "perl" {
+	if d.Distvname != "perl-5.24.4-RC1" {
 		t.Fatal("oops")
 	}
 

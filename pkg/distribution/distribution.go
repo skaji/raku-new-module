@@ -21,7 +21,6 @@ func (d *Error) Error() string {
 type Distribution struct {
 	CPANID     string `json:"cpanid"`
 	Distvname  string `json:"distvname"`
-	Distname   string `json:"distname"`
 	MainModule string `json:"main_module"`
 	IsRaku     bool   `json:"raku"`
 	ID         string `json:"-"`
@@ -54,7 +53,6 @@ func New(id string, str string) (*Distribution, error) {
 		parts = parts[:len(parts)-1]
 	}
 
-	d.Distname = strings.Join(parts[:len(parts)-1], "-")
 	d.MainModule = strings.Join(parts[:len(parts)-1], "::")
 	return &d, nil
 }
