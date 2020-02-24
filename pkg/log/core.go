@@ -21,3 +21,6 @@ func (l *CoreLogger) Printf(format string, v ...interface{}) {
 func (l *CoreLogger) Println(v ...interface{}) {
 	l.Logger.Output(l.Level, fmt.Sprintln(v...))
 }
+
+func (l *CoreLogger) Close() {
+}

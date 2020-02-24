@@ -26,6 +26,10 @@ func Println(v ...interface{}) {
 	logger.Println(v...)
 }
 
+func Close() {
+	logger.Close()
+}
+
 var debug = os.Getenv("DEBUG") != ""
 
 func Debugf(format string, v ...interface{}) {

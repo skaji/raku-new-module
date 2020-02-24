@@ -27,6 +27,7 @@ func main() {
 	if c.SlackURL != "" {
 		log.Set(log.NewSlack(c.SlackURL))
 	}
+	defer log.Close()
 
 	log.Println("start")
 	run(c)

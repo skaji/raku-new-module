@@ -18,6 +18,9 @@ type SlackLogger struct {
 	url    string
 	ch     chan string
 	Logger Logger
+
+	stop chan<- struct{}
+	done <-chan struct{}
 }
 
 func NewSlack(url string) Logger {
@@ -29,7 +32,14 @@ func NewSlack(url string) Logger {
 			Logger: base.New(os.Stderr, "", base.LstdFlags|base.Llongfile),
 		},
 	}
-	go l.poster()
+	stop := make(chan struct{})
+	done := make(chan struct{})
+	go func() {
+		l.poster(stop)
+		close(done)
+	}()
+	l.stop = stop
+	l.done = done
 	return l
 }
 
@@ -47,6 +57,12 @@ func (l *SlackLogger) Println(v ...interface{}) {
 	l.Logger.Println(v...)
 }
 
+func (l *SlackLogger) Close() {
+	l.Logger.Close()
+	close(l.stop)
+	<-l.done
+}
+
 func (l *SlackLogger) Post(text string) {
 	select {
 	case l.ch <- text:
@@ -55,17 +71,17 @@ func (l *SlackLogger) Post(text string) {
 	}
 }
 
-func (l *SlackLogger) poster() {
-	ticker := time.NewTicker(time.Second)
-	defer ticker.Stop()
-
-	for range ticker.C {
-		text := <-l.ch
-		go func() {
+func (l *SlackLogger) poster(stop <-chan struct{}) {
+	for {
+		select {
+		case text := <-l.ch:
 			if err := l.post(text); err != nil {
 				l.Logger.Println(err)
 			}
-		}()
+		case <-stop:
+			return
+		}
+
 	}
 }
 
