@@ -2,7 +2,6 @@ package log
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -17,6 +16,7 @@ import (
 type SlackLogger struct {
 	url    string
 	ch     chan string
+	client *http.Client
 	Logger Logger
 
 	stop chan<- struct{}
@@ -25,8 +25,9 @@ type SlackLogger struct {
 
 func NewSlack(url string) Logger {
 	l := &SlackLogger{
-		url: url,
-		ch:  make(chan string, 1000),
+		url:    url,
+		ch:     make(chan string, 1000),
+		client: &http.Client{Timeout: 3 * time.Second},
 		Logger: &CoreLogger{
 			Level:  4,
 			Logger: base.New(os.Stderr, "", base.LstdFlags|base.Llongfile),
@@ -61,6 +62,17 @@ func (l *SlackLogger) Close() {
 	l.Logger.Close()
 	close(l.stop)
 	<-l.done
+	for {
+		select {
+		case text := <-l.ch:
+			if err := l.post(text); err != nil {
+				l.Logger.Println(err)
+			}
+		default:
+			return
+		}
+
+	}
 }
 
 func (l *SlackLogger) Post(text string) {
@@ -96,10 +108,7 @@ func (l *SlackLogger) post(text string) error {
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-	req = req.WithContext(ctx)
-	res, err := http.DefaultClient.Do(req)
+	res, err := l.client.Do(req)
 	if err != nil {
 		return err
 	}
