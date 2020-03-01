@@ -59,9 +59,11 @@ func (l *SlackLogger) Println(v ...interface{}) {
 }
 
 func (l *SlackLogger) Close() {
-	l.Logger.Close()
 	close(l.stop)
-	defer func() { <-l.done }()
+	defer func() {
+		l.Logger.Close()
+		<-l.done
+	}()
 	for {
 		select {
 		case text := <-l.ch:
@@ -71,7 +73,6 @@ func (l *SlackLogger) Close() {
 		default:
 			return
 		}
-
 	}
 }
 
