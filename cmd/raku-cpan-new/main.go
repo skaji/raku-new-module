@@ -29,15 +29,15 @@ func main() {
 	}
 	defer log.Close()
 
-	log.Println("start")
+	log.Print("start")
 	run(c)
-	log.Println("finish")
+	log.Print("finish")
 }
 
 func run(c *config.Config) {
 	tw := twitter.NewNoop()
 	if c.ConsumerKey != "" {
-		log.Println("will tweet with ConsumerKey", c.ConsumerKey)
+		log.Print("will tweet with ConsumerKey", c.ConsumerKey)
 		tw = twitter.New(c.ConsumerKey, c.ConsumerSecret, c.AccessToken, c.AccessSecret)
 	}
 
@@ -53,9 +53,9 @@ func run(c *config.Config) {
 	strm := stream.NewRaku(ctx, c.Addr, time.Duration(c.Tick)*time.Second)
 	for dist := range strm {
 		summary := dist.Summary()
-		log.Println(dist.ID, "tweet", strings.Replace(summary, "\n", " ", -1))
+		log.Print(dist.ID, "tweet", strings.Replace(summary, "\n", " ", -1))
 		if err := tw.Tweet(summary); err != nil {
-			log.Println(dist.ID, err)
+			log.Print(dist.ID, err)
 		}
 	}
 }

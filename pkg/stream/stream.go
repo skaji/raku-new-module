@@ -1,15 +1,14 @@
 package stream
 
 import (
-	"bytes"
 	"context"
 	"errors"
-	"net/mail"
+	"fmt"
 	"time"
 
+	"github.com/skaji/go-nntp-stream"
 	"github.com/skaji/raku-cpan-new/pkg/distribution"
 	"github.com/skaji/raku-cpan-new/pkg/log"
-	"github.com/skaji/raku-cpan-new/pkg/nntp"
 )
 
 func fixRakuDistribution(ctx context.Context, d *distribution.Distribution) error {
@@ -32,9 +31,9 @@ func fixRakuDistribution(ctx context.Context, d *distribution.Distribution) erro
 			return err
 		}
 
-		log.Println(d.ID, err)
+		log.Print(d.ID, err)
 		if i != max {
-			log.Println(d.ID, "Sleep 30sec...")
+			log.Print(d.ID, "Sleep 30sec...")
 			time.Sleep(30 * time.Second)
 		}
 	}
@@ -46,39 +45,48 @@ func NewRaku(ctx context.Context, addr string, tick time.Duration) <-chan *distr
 	go func() {
 		defer close(ch)
 
-		nntpChannel := nntp.Tail(ctx, addr, "perl.cpan.uploads", tick, 0)
-		seen := make(map[string]bool)
+		stream := nntp.Stream(ctx, nntp.StreamConfig{
+			Addr:    addr,
+			Tick:    tick,
+			Group:   "perl.cpan.uploads",
+			Timeout: 25 * time.Second,
+		})
 
-		for article := range nntpChannel {
-			id := article.ID
-			msg, err := mail.ReadMessage(bytes.NewReader(article.Article))
-			if err != nil {
-				log.Println(id, err)
+		seen := make(map[int]bool)
+		for event := range stream {
+			if event.Type != nntp.EventTypeArticle {
+				if event.Type == nntp.EventTypeDebug {
+					log.Debug(event.Message)
+				} else {
+					log.Print(event.Message)
+				}
 				continue
 			}
-			subject := msg.Header.Get("Subject")
+			article := event.Article
+			id := article.ID
+			subject := article.Header.Get("Subject")
 			dist, err := distribution.New(id, subject)
 			if err != nil {
-				log.Println(id, err)
+				log.Print(id, err)
 				continue
 			}
 
-			log.Println(id, dist.AsJSON())
+			log.Print(id, dist.AsJSON())
 			if !dist.IsRaku {
 				continue
 			}
 			if seen[id] {
-				log.Println(id, "Already seen "+id+", skip")
+				log.Print(id, fmt.Sprintf("Already seen %d, skip", id))
 				continue
 			}
 			seen[id] = true
 
-			go func(id string) {
+			go func(id int) {
 				err := fixRakuDistribution(ctx, dist)
 				if err == nil {
 					ch <- dist
 				} else {
-					log.Println(id, err)
+					log.Print(id, err)
 				}
 			}(id)
 		}

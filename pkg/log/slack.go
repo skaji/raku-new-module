@@ -53,9 +53,17 @@ func (l *SlackLogger) Printf(format string, v ...interface{}) {
 	l.Logger.Printf(format, v...)
 }
 
-func (l *SlackLogger) Println(v ...interface{}) {
+func (l *SlackLogger) Print(v ...interface{}) {
 	l.Post(fmt.Sprintln(v...))
-	l.Logger.Println(v...)
+	l.Logger.Print(v...)
+}
+
+func (l *SlackLogger) Debug(v ...interface{}) {
+	l.Logger.Print(v...)
+}
+
+func (l *SlackLogger) Debugf(format string, v ...interface{}) {
+	l.Logger.Printf(format, v...)
 }
 
 func (l *SlackLogger) Close() {
@@ -68,7 +76,7 @@ func (l *SlackLogger) Close() {
 		select {
 		case text := <-l.ch:
 			if err := l.post(text); err != nil {
-				l.Logger.Println(err)
+				l.Logger.Print(err)
 			}
 		default:
 			return
@@ -80,7 +88,7 @@ func (l *SlackLogger) Post(text string) {
 	select {
 	case l.ch <- text:
 	default:
-		l.Logger.Println("slack channel is full, skip", text)
+		l.Logger.Print("slack channel is full, skip", text)
 	}
 }
 
@@ -89,7 +97,7 @@ func (l *SlackLogger) poster(stop <-chan struct{}) {
 		select {
 		case text := <-l.ch:
 			if err := l.post(text); err != nil {
-				l.Logger.Println(err)
+				l.Logger.Print(err)
 			}
 		case <-stop:
 			return

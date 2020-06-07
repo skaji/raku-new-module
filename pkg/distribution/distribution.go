@@ -23,10 +23,10 @@ type Distribution struct {
 	Distvname  string `json:"distvname"`
 	MainModule string `json:"main_module"`
 	IsRaku     bool   `json:"raku"`
-	ID         string `json:"-"`
+	ID         int    `json:"-"`
 }
 
-func New(id string, str string) (*Distribution, error) {
+func New(id int, str string) (*Distribution, error) {
 	res := distributionRegexp.FindAllStringSubmatch(str, -1)
 	if len(res) == 0 {
 		msg := fmt.Sprintf("failed to parse string '%s'", str)

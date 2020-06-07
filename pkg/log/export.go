@@ -7,7 +7,7 @@ import (
 
 var logger Logger = &CoreLogger{
 	Level:  3,
-	Logger: base.New(os.Stderr, "", base.LstdFlags|base.Llongfile),
+	Logger: base.New(os.Stderr, "", base.LstdFlags|base.Lshortfile),
 }
 
 func Set(l Logger) {
@@ -22,18 +22,18 @@ func Printf(format string, v ...interface{}) {
 	logger.Printf(format, v...)
 }
 
-func Println(v ...interface{}) {
-	logger.Println(v...)
+func Print(v ...interface{}) {
+	logger.Print(v...)
+}
+
+func Debugf(format string, v ...interface{}) {
+	logger.Debugf(format, v...)
+}
+
+func Debug(v ...interface{}) {
+	logger.Debug(v...)
 }
 
 func Close() {
 	logger.Close()
-}
-
-var debug = os.Getenv("DEBUG") != ""
-
-func Debugf(format string, v ...interface{}) {
-	if debug {
-		logger.Printf(format, v...)
-	}
 }
