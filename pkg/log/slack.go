@@ -59,11 +59,11 @@ func (l *SlackLogger) Print(v ...interface{}) {
 }
 
 func (l *SlackLogger) Debug(v ...interface{}) {
-	l.Logger.Print(v...)
+	l.Logger.Debug(v...)
 }
 
 func (l *SlackLogger) Debugf(format string, v ...interface{}) {
-	l.Logger.Printf(format, v...)
+	l.Logger.Debugf(format, v...)
 }
 
 func (l *SlackLogger) Close() {
