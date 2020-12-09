@@ -17,10 +17,18 @@ import (
 
 func main() {
 	if len(os.Args) == 1 || os.Args[1] == "-h" || os.Args[1] == "--help" {
-		fmt.Println("Usage: raku-cpan-new config.json")
+		fmt.Println("Usage: raku-cpan-new config.json/-config-from-env")
 		os.Exit(1)
 	}
-	c, err := config.NewFromFile(os.Args[1])
+	var (
+		c   *config.Config
+		err error
+	)
+	if os.Args[1] == "-config-from-env" {
+		c, err = config.NewFromEnv()
+	} else {
+		c, err = config.NewFromFile(os.Args[1])
+	}
 	if err != nil {
 		log.Fatal(err)
 	}
