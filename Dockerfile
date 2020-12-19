@@ -7,6 +7,7 @@ COPY ./ ./
 RUN cd cmd/raku-cpan-new && go build
 
 FROM alpine:3.12
+LABEL org.opencontainers.image.source https://github.com/skaji/raku-cpan-new
 RUN set -eux; \
   apk add --update --no-cache tzdata ca-certificates tini; \
   cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime; \
