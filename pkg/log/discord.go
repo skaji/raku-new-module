@@ -123,7 +123,6 @@ func (l *DiscordLogger) post(text string) error {
 	}
 	io.Copy(ioutil.Discard, res.Body)
 	res.Body.Close()
-	io.Copy(ioutil.Discard, res.Body)
 	if res.StatusCode/100 == 2 {
 		return nil
 	}
