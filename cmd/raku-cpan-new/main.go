@@ -34,6 +34,8 @@ func main() {
 	}
 	if c.SlackURL != "" {
 		log.Set(log.NewSlack(c.SlackURL))
+	} else if c.DiscordURL != "" {
+		log.Set(log.NewDiscord(c.DiscordURL))
 	}
 	defer log.Close()
 

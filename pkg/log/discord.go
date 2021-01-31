@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-type SlackLogger struct {
+type DiscordLogger struct {
 	url    string
 	ch     chan string
 	client *http.Client
@@ -23,8 +23,8 @@ type SlackLogger struct {
 	done <-chan struct{}
 }
 
-func NewSlack(url string) Logger {
-	l := &SlackLogger{
+func NewDiscord(url string) Logger {
+	l := &DiscordLogger{
 		url:    url,
 		ch:     make(chan string, 1000),
 		client: &http.Client{Timeout: 3 * time.Second},
@@ -44,29 +44,29 @@ func NewSlack(url string) Logger {
 	return l
 }
 
-func (l *SlackLogger) Fatal(v ...interface{}) {
+func (l *DiscordLogger) Fatal(v ...interface{}) {
 	l.Logger.Fatal(v...)
 }
 
-func (l *SlackLogger) Printf(format string, v ...interface{}) {
+func (l *DiscordLogger) Printf(format string, v ...interface{}) {
 	l.Post(fmt.Sprintf(format, v...))
 	l.Logger.Printf(format, v...)
 }
 
-func (l *SlackLogger) Print(v ...interface{}) {
+func (l *DiscordLogger) Print(v ...interface{}) {
 	l.Post(fmt.Sprintln(v...))
 	l.Logger.Print(v...)
 }
 
-func (l *SlackLogger) Debug(v ...interface{}) {
+func (l *DiscordLogger) Debug(v ...interface{}) {
 	l.Logger.Debug(v...)
 }
 
-func (l *SlackLogger) Debugf(format string, v ...interface{}) {
+func (l *DiscordLogger) Debugf(format string, v ...interface{}) {
 	l.Logger.Debugf(format, v...)
 }
 
-func (l *SlackLogger) Close() {
+func (l *DiscordLogger) Close() {
 	close(l.stop)
 	defer func() {
 		l.Logger.Close()
@@ -84,15 +84,15 @@ func (l *SlackLogger) Close() {
 	}
 }
 
-func (l *SlackLogger) Post(text string) {
+func (l *DiscordLogger) Post(text string) {
 	select {
 	case l.ch <- text:
 	default:
-		l.Logger.Print("slack channel is full, skip", text)
+		l.Logger.Print("discord channel is full, skip", text)
 	}
 }
 
-func (l *SlackLogger) poster(stop <-chan struct{}) {
+func (l *DiscordLogger) poster(stop <-chan struct{}) {
 	for {
 		select {
 		case text := <-l.ch:
@@ -106,8 +106,8 @@ func (l *SlackLogger) poster(stop <-chan struct{}) {
 	}
 }
 
-func (l *SlackLogger) post(text string) error {
-	body, err := json.Marshal(map[string]string{"text": text})
+func (l *DiscordLogger) post(text string) error {
+	body, err := json.Marshal(map[string]string{"username": "camelia", "content": text})
 	if err != nil {
 		return err
 	}
@@ -123,6 +123,7 @@ func (l *SlackLogger) post(text string) error {
 	}
 	io.Copy(ioutil.Discard, res.Body)
 	res.Body.Close()
+	io.Copy(ioutil.Discard, res.Body)
 	if res.StatusCode/100 == 2 {
 		return nil
 	}

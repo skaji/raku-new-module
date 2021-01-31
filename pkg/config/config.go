@@ -15,6 +15,7 @@ type Config struct {
 	Addr           string `json:"addr" envconfig:"addr"`
 	Tick           int    `json:"tick" envconfig:"tick"`
 	SlackURL       string `json:"slack_url" envconfig:"slack_url"`
+	DiscordURL     string `json:"discord_url" envconfig:"discord_url"`
 }
 
 func NewFromFile(file string) (*Config, error) {
