@@ -1,4 +1,4 @@
-FROM golang:1.15-alpine3.12 as builder
+FROM golang:1.16-alpine3.13 as builder
 WORKDIR /go/src/github.com/skaji/raku-cpan-new
 COPY go.* ./
 RUN apk add --update --no-cache git
@@ -6,7 +6,7 @@ RUN go mod download
 COPY ./ ./
 RUN cd cmd/raku-cpan-new && go build
 
-FROM alpine:3.12
+FROM alpine:3.13
 LABEL org.opencontainers.image.source https://github.com/skaji/raku-cpan-new
 RUN set -eux; \
   apk add --update --no-cache tzdata ca-certificates tini; \
