@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -35,7 +35,7 @@ func (f *RakuFetcher) fetchMeta(ctx context.Context, metaURL string) ([]byte, er
 	if err != nil {
 		return nil, err
 	}
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	res.Body.Close()
 	if err != nil {
 		return nil, err

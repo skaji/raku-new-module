@@ -2,7 +2,7 @@ package config
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 
 	"github.com/kelseyhightower/envconfig"
 )
@@ -19,7 +19,7 @@ type Config struct {
 }
 
 func NewFromFile(file string) (*Config, error) {
-	content, err := ioutil.ReadFile(file)
+	content, err := os.ReadFile(file)
 	if err != nil {
 		return nil, err
 	}

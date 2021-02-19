@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	base "log"
 	"net/http"
 	"os"
@@ -121,7 +120,7 @@ func (l *SlackLogger) post(text string) error {
 	if err != nil {
 		return err
 	}
-	io.Copy(ioutil.Discard, res.Body)
+	io.Copy(io.Discard, res.Body)
 	res.Body.Close()
 	if res.StatusCode/100 == 2 {
 		return nil

@@ -51,14 +51,8 @@ func run(c *config.Config) {
 		tw = twitter.New(c.ConsumerKey, c.ConsumerSecret, c.AccessToken, c.AccessSecret)
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	go func() {
-		sig := make(chan os.Signal, 1)
-		signal.Notify(sig, syscall.SIGTERM, syscall.SIGINT)
-		s := <-sig
-		log.Printf("catch %v\n", s)
-		cancel()
-	}()
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
+	defer stop()
 
 	strm := stream.NewRaku(ctx, c.Addr, time.Duration(c.Tick)*time.Second)
 	for dist := range strm {
