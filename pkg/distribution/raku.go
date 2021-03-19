@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 )
 
@@ -33,6 +34,9 @@ func (f *RakuFetcher) fetchMeta(ctx context.Context, metaURL string) ([]byte, er
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
+		if e, ok := err.(net.Error); ok && e.Timeout() {
+			return nil, &RetryableError{Message: e.Error()}
+		}
 		return nil, err
 	}
 	body, err := io.ReadAll(res.Body)
