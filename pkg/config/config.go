@@ -12,7 +12,7 @@ type Config struct {
 	ConsumerSecret string `json:"consumer_secret" envconfig:"consumer_secret"`
 	AccessToken    string `json:"access_token" envconfig:"access_token"`
 	AccessSecret   string `json:"access_secret" envconfig:"access_secret"`
-	Addr           string `json:"addr" envconfig:"addr"`
+	RecentURL      string `json:"recent_url" envconfig:"recent_url"`
 	Tick           int    `json:"tick" envconfig:"tick"`
 	SlackURL       string `json:"slack_url" envconfig:"slack_url"`
 	DiscordURL     string `json:"discord_url" envconfig:"discord_url"`

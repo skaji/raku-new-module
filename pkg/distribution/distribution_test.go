@@ -1,58 +1,35 @@
 package distribution
 
-import "testing"
+import (
+	"encoding/json"
+	"testing"
+)
 
 func TestDistribution(t *testing.T) {
+	j := `
+	{
+      "id": "zef:lizmat/Identity::Utils/0.0.9",
+      "content_text": "Provide utility functions related to distribution identities",
+      "title": "Identity::Utils 0.0.9",
+      "authors": [
+        {
+          "url": "https://raku.land/zef:lizmat",
+          "name": "Elizabeth Mattijsen",
+          "avatar": "https://www.gravatar.com/avatar/d40db3cabae1b579841c2e60f099529c?d=identicon"
+        }
+      ],
+      "date_published": "2022-02-10T17:47:35Z",
+      "url": "https://raku.land/zef:lizmat/Identity::Utils"
+    }
+	`
 	var d *Distribution
-	var err error
-
-	d, err = New(1, "foo bar baz")
-	if _, ok := err.(*Error); !ok {
-		t.Fatal("oops")
-	}
-	if err == nil {
-		t.Fatal("oops")
-	}
-
-	d, err = New(1, "CPAN Upload: S/SK/SKAJI/Perl6/App-Mi6-0.1.6.tar.gz")
-	if err != nil {
+	if err := json.Unmarshal([]byte(j), &d); err != nil {
 		t.Fatal(err)
 	}
-	if !d.IsRaku {
-		t.Fatal("oops")
+	if d.Published.Unix() != 1644515255 {
+		t.Fatal()
 	}
-	if d.MainModule != "App::Mi6" {
-		t.Fatal("oops")
+	if d.Auth() != "zef:lizmat" {
+		t.Fatal()
 	}
-
-	d, err = New(1, "CPAN Upload:S/SK/SKAJI/App-cpm-0.963.tar.gz")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if d.IsRaku {
-		t.Fatal("oops")
-	}
-
-	d, err = New(1, "S/SK/SKAJI/App-cpm-0.963-TRIAL.tar.gz")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if d.IsRaku {
-		t.Fatal("oops")
-	}
-	if d.Distvname != "App-cpm-0.963-TRIAL" {
-		t.Fatal("oops")
-	}
-
-	d, err = New(1, "https://cpan.metacpan.org/authors/id/S/SH/SHAY/perl-5.24.4-RC1.tar.bz2")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if d.IsRaku {
-		t.Fatal("oops")
-	}
-	if d.Distvname != "perl-5.24.4-RC1" {
-		t.Fatal("oops")
-	}
-
 }

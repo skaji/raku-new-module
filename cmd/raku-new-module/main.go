@@ -9,15 +9,15 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/skaji/raku-cpan-new/pkg/config"
-	"github.com/skaji/raku-cpan-new/pkg/log"
-	"github.com/skaji/raku-cpan-new/pkg/stream"
-	"github.com/skaji/raku-cpan-new/pkg/twitter"
+	"github.com/skaji/raku-new-module/pkg/config"
+	"github.com/skaji/raku-new-module/pkg/log"
+	"github.com/skaji/raku-new-module/pkg/stream"
+	"github.com/skaji/raku-new-module/pkg/twitter"
 )
 
 func main() {
 	if len(os.Args) == 1 || os.Args[1] == "-h" || os.Args[1] == "--help" {
-		fmt.Println("Usage: raku-cpan-new config.json/-config-from-env")
+		fmt.Println("Usage: raku-new-module config.json/-config-from-env")
 		os.Exit(1)
 	}
 	var (
@@ -40,11 +40,13 @@ func main() {
 	defer log.Close()
 
 	log.Print("start")
-	run(c)
+	if err := run(c); err != nil {
+		log.Fatal(err)
+	}
 	log.Print("finish")
 }
 
-func run(c *config.Config) {
+func run(c *config.Config) error {
 	tw := twitter.NewNoop()
 	if c.ConsumerKey != "" {
 		log.Print("will tweet with ConsumerKey", c.ConsumerKey)
@@ -54,12 +56,20 @@ func run(c *config.Config) {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
 	defer stop()
 
-	strm := stream.NewRaku(ctx, c.Addr, time.Duration(c.Tick)*time.Second)
+	strm, err := stream.NewRaku(ctx, c.RecentURL, time.Duration(c.Tick)*time.Second)
+	if err != nil {
+		return err
+	}
 	for dist := range strm {
+		if !dist.IsZef() && !dist.IsCPAN() {
+			log.Print(dist.ID, "skip")
+			continue
+		}
 		summary := dist.Summary()
 		log.Print(dist.ID, "tweet", strings.Replace(summary, "\n", " ", -1))
 		if err := tw.Tweet(summary); err != nil {
 			log.Print(dist.ID, err)
 		}
 	}
+	return nil
 }
