@@ -2,10 +2,13 @@
 
 https://twitter.com/raku_new_module
 
+# Credit
+
+The source is https://raku.land/recent/json
+
 ## See also
 
 * https://twitter.com/cpan_new
-* https://raku.land/recent/json
 
 ## License
 
