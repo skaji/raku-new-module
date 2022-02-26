@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 	"time"
 
@@ -65,9 +64,8 @@ func run(c *config.Config) error {
 			log.Print(dist.ID, "skip")
 			continue
 		}
-		summary := dist.Summary()
-		log.Print(dist.ID, "tweet", strings.Replace(summary, "\n", " ", -1))
-		if err := tw.Tweet(summary); err != nil {
+		log.Print(dist.ID, "tweet", dist.URL)
+		if err := tw.Tweet(dist.Summary()); err != nil {
 			log.Print(dist.ID, err)
 		}
 	}
