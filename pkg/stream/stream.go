@@ -25,7 +25,7 @@ func NewRaku(ctx context.Context, url string, tick time.Duration) (<-chan *distr
 		}
 		log.Debugf("returns %s %s ~ %s %s", dists[0].ID, dists[0].Published.Local().Format(time.RFC3339), dists[len(dists)-1].ID, dists[len(dists)-1].Published.Local().Format(time.RFC3339))
 		dist := dists[len(dists)-1]
-		log.Printf("will tweet after %s %s", dist.ID, dist.Published.Local().Format(time.RFC3339))
+		log.Printf("will notify after %s %s", dist.ID, dist.Published.Local().Format(time.RFC3339))
 		lastSeen = dist.Published
 	}
 

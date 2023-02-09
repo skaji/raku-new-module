@@ -1,11 +1,12 @@
 module github.com/skaji/raku-new-module
 
-go 1.19
+go 1.20
 
 require (
-	github.com/dghubble/go-twitter v0.0.0-20221024160433-0cc1e72ed6d8
-	github.com/dghubble/oauth1 v0.7.1
+	github.com/dghubble/go-twitter v0.0.0-20221104224141-912508c3888b
+	github.com/dghubble/oauth1 v0.7.2
 	github.com/kelseyhightower/envconfig v1.4.0
+	golang.org/x/sync v0.1.0
 )
 
 require (

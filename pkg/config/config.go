@@ -8,14 +8,16 @@ import (
 )
 
 type Config struct {
-	ConsumerKey    string `json:"consumer_key" envconfig:"consumer_key"`
-	ConsumerSecret string `json:"consumer_secret" envconfig:"consumer_secret"`
-	AccessToken    string `json:"access_token" envconfig:"access_token"`
-	AccessSecret   string `json:"access_secret" envconfig:"access_secret"`
-	RecentURL      string `json:"recent_url" envconfig:"recent_url"`
-	Tick           int    `json:"tick" envconfig:"tick"`
-	SlackURL       string `json:"slack_url" envconfig:"slack_url"`
-	DiscordURL     string `json:"discord_url" envconfig:"discord_url"`
+	TwitterConsumerKey    string `json:"twitter_consumer_key" envconfig:"twitter_consumer_key"`
+	TwitterConsumerSecret string `json:"twitter_consumer_secret" envconfig:"twitter_consumer_secret"`
+	TwitterAccessToken    string `json:"twitter_access_token" envconfig:"twitter_access_token"`
+	TwitterAccessSecret   string `json:"twitter_access_secret" envconfig:"twitter_access_secret"`
+	MastodonURL           string `json:"mastodon_url" envconfig:"mastodon_url"`
+	MastodonAccessToken   string `json:"mastodon_access_token" envconfig:"mastodon_access_token"`
+	RecentURL             string `json:"recent_url" envconfig:"recent_url"`
+	Tick                  int    `json:"tick" envconfig:"tick"`
+	SlackURL              string `json:"slack_url" envconfig:"slack_url"`
+	DiscordURL            string `json:"discord_url" envconfig:"discord_url"`
 }
 
 func NewFromFile(file string) (*Config, error) {

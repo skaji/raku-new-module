@@ -10,8 +10,8 @@ import (
 
 	"github.com/skaji/raku-new-module/pkg/config"
 	"github.com/skaji/raku-new-module/pkg/log"
+	"github.com/skaji/raku-new-module/pkg/notification"
 	"github.com/skaji/raku-new-module/pkg/stream"
-	"github.com/skaji/raku-new-module/pkg/twitter"
 )
 
 func main() {
@@ -46,10 +46,18 @@ func main() {
 }
 
 func run(c *config.Config) error {
-	tw := twitter.NewNoop()
-	if c.ConsumerKey != "" {
-		log.Print("will tweet with ConsumerKey", c.ConsumerKey)
-		tw = twitter.New(c.ConsumerKey, c.ConsumerSecret, c.AccessToken, c.AccessSecret)
+	var notifiers notification.Notifiers
+	if c.TwitterConsumerKey != "" {
+		log.Print("will notify to twitter")
+		notifiers = append(notifiers, notification.NewTwitter(
+			c.TwitterConsumerKey, c.TwitterConsumerSecret, c.TwitterAccessToken, c.TwitterAccessSecret,
+		))
+	}
+	if c.MastodonAccessToken != "" {
+		log.Print("will notify to mastodon")
+		notifiers = append(notifiers, notification.NewMastodon(
+			c.MastodonURL, c.MastodonAccessToken,
+		))
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
@@ -64,10 +72,13 @@ func run(c *config.Config) error {
 			log.Print(dist.ID, "skip")
 			continue
 		}
-		log.Print(dist.ID, "tweet", dist.URL)
-		if err := tw.Tweet(dist.Summary()); err != nil {
+
+		log.Print(dist.ID, "notify", dist.URL)
+		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		if err := notifiers.Notify(ctx, dist.Summary()); err != nil {
 			log.Print(dist.ID, err)
 		}
+		cancel()
 	}
 	return nil
 }
