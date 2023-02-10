@@ -23,4 +23,4 @@ func (t *Twitter) Notify(ctx context.Context, message string) error {
 	return err
 }
 
-var _ Notifier = &Twitter{}
+var _ Notifier = (*Twitter)(nil)

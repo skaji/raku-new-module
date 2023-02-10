@@ -43,4 +43,4 @@ func (m *Mastodon) post(ctx context.Context, u string, data url.Values) error {
 	return nil
 }
 
-var _ Notifier = &Mastodon{}
+var _ Notifier = (*Mastodon)(nil)

@@ -13,7 +13,7 @@ type Notifier interface {
 type Notifiers []Notifier
 
 func (ns Notifiers) Notify(ctx context.Context, message string) error {
-	switch l := len(ns); l {
+	switch len(ns) {
 	case 0:
 		return nil
 	case 1:
@@ -29,3 +29,5 @@ func (ns Notifiers) Notify(ctx context.Context, message string) error {
 		return group.Wait()
 	}
 }
+
+var _ Notifier = Notifiers(nil)
