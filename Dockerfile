@@ -1,12 +1,11 @@
-FROM golang:1.17-alpine3.14 as builder
-WORKDIR /go/src/github.com/skaji/raku-new-module
-COPY go.* ./
+ARG GO_VERSION
+FROM golang:$GO_VERSION-alpine as builder
 RUN apk add --update --no-cache git
-RUN go mod download
+WORKDIR /app
 COPY ./ ./
 RUN cd cmd/raku-new-module && go build
 
-FROM alpine:3.14
+FROM alpine
 LABEL org.opencontainers.image.source https://github.com/skaji/raku-new-module
 RUN set -eux; \
   apk add --update --no-cache tzdata ca-certificates tini; \
@@ -14,5 +13,5 @@ RUN set -eux; \
   echo Asia/Tokyo > /etc/timezone; \
   apk del tzdata; \
   :
-COPY --from=builder /go/src/github.com/skaji/raku-new-module/cmd/raku-new-module/raku-new-module /raku-new-module
+COPY --from=builder /app/cmd/raku-new-module/raku-new-module /raku-new-module
 ENTRYPOINT ["/sbin/tini", "--"]
