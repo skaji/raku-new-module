@@ -3,7 +3,7 @@ FROM golang:$GO_VERSION-alpine as builder
 RUN apk add --update --no-cache git
 WORKDIR /app
 COPY ./ ./
-RUN cd cmd/raku-new-module && go build
+RUN cd cmd/raku-new-module && go build -buildvcs=false
 
 FROM alpine
 LABEL org.opencontainers.image.source https://github.com/skaji/raku-new-module
@@ -15,3 +15,4 @@ RUN set -eux; \
   :
 COPY --from=builder /app/cmd/raku-new-module/raku-new-module /raku-new-module
 ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["/raku-new-module", "-config-from-env"]

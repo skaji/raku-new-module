@@ -1,0 +1,14 @@
+app = "raku-new-module"
+primary_region = "nrt"
+
+[build.args]
+  GO_VERSION="1.20"
+
+[env]
+  APP_RECENT_URL = "https://raku.land/recent/json"
+  APP_TICK = "300"
+  # APP_SLACK_URL
+  # APP_TWITTER_ACCESS_SECRET
+  # APP_TWITTER_ACCESS_TOKEN
+  # APP_TWITTER_CONSUMER_KEY
+  # APP_TWITTER_CONSUMER_SECRET
